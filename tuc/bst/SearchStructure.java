@@ -1,4 +1,3 @@
-package bst;
 
 import java.util.List;
 

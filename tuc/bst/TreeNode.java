@@ -1,4 +1,3 @@
-package bst;
 
 public class TreeNode {
 
