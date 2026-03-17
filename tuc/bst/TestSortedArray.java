@@ -27,7 +27,6 @@ public class TestSortedArray {
         structure.printArray();
 
         System.out.println("Delete 100: " + structure.delete(100));
-        
 
         structure.insert(10); // duplicate
         System.out.print("Array after duplicate insert of 10: ");

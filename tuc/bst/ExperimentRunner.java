@@ -4,7 +4,7 @@ public class ExperimentRunner {
 
     static Random random = new Random();
 
-    private static final int[] NS = {30, 50, 100, 200, 500, 800, 1000, 5000, 10000, 100000};
+    private static final int[] NS = { 30, 50, 100, 200, 500, 800, 1000, 5000, 10000, 100000 };
 
     public static void main(String[] args) {
 
@@ -51,9 +51,9 @@ public class ExperimentRunner {
         SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(200000);
 
         int[] initialKeys = random.ints(1, 2 * N + 1)
-                                  .distinct()
-                                  .limit(N)
-                                  .toArray();
+                .distinct()
+                .limit(N)
+                .toArray();
 
         for (int key : initialKeys) {
             tree1.insert(key);
@@ -70,11 +70,9 @@ public class ExperimentRunner {
 
     private static void printHeader() {
         System.out.println(
-            "N | DynOps | DynTime | DynLevels | ArrOps | ArrTime | ArrLevels | BinOps | BinTime | BinLevels"
-        );
+                "N | DynOps | DynTime | DynLevels | ArrOps | ArrTime | ArrLevels | BinOps | BinTime | BinLevels");
         System.out.println(
-            "----------------------------------------------------------------------------------------------------"
-        );
+                "----------------------------------------------------------------------------------------------------");
     }
 
     private static int getK(int N) {
@@ -88,24 +86,8 @@ public class ExperimentRunner {
     }
 
     private static String avg(long total, int K) {
-        double value = Math.round(((double) total / K) * 100.0) / 100.0;
-        String text = String.valueOf(value);
-
-        if (!text.contains(".")) {
-            return text + ".00";
-        }
-
-        int digitsAfterDot = text.length() - text.indexOf('.') - 1;
-
-        if (digitsAfterDot == 0) {
-            return text + "00";
-        }
-
-        if (digitsAfterDot == 1) {
-            return text + "0";
-        }
-
-        return text;
+        double value = (double) total / K;
+        return String.format(java.util.Locale.US, "%.2f", value); // format with 2 decimal places
     }
 
     private static ExperimentStructures buildStructures(int N) {
@@ -114,9 +96,9 @@ public class ExperimentRunner {
         SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(200000);
 
         int[] initialKeys = random.ints(1, 2 * N + 1)
-                                  .distinct()
-                                  .limit(N)
-                                  .toArray();
+                .distinct()
+                .limit(N)
+                .toArray();
 
         for (int key : initialKeys) {
             tree1.insert(key);
@@ -281,17 +263,16 @@ public class ExperimentRunner {
             long time3, long ops3, long lev3,
             int K) {
 
-        String row =
-            N + " | " +
-            avg(ops1, K) + " | " +
-            avg(time1, K) + " | " +
-            avg(lev1, K) + " | " +
-            avg(ops2, K) + " | " +
-            avg(time2, K) + " | " +
-            avg(lev2, K) + " | " +
-            avg(ops3, K) + " | " +
-            avg(time3, K) + " | " +
-            avg(lev3, K);
+        String row = N + " | " +
+                avg(ops1, K) + " | " +
+                avg(time1, K) + " | " +
+                avg(lev1, K) + " | " +
+                avg(ops2, K) + " | " +
+                avg(time2, K) + " | " +
+                avg(lev2, K) + " | " +
+                avg(ops3, K) + " | " +
+                avg(time3, K) + " | " +
+                avg(lev3, K);
 
         System.out.println(row);
     }
