@@ -4,256 +4,307 @@ public class ExperimentRunner {
 
     static Random random = new Random();
 
+    private static final int[] NS = {30, 50, 100, 200, 500, 800, 1000, 5000, 10000, 100000};
+
     public static void main(String[] args) {
 
-        int[] Ns = {30,50,100,200,500,800,1000,5000,10000,100000};
+        printInorderForN30();
 
-        for(int N : Ns){
+        System.out.println("\n==============================================================");
+        System.out.println("Operation A - Insert");
+        System.out.println("==============================================================");
+        printHeader();
+        for (int N : NS) {
+            printInsertRow(N);
+        }
 
-            System.out.println("\n==============================");
-            System.out.println("N = " + N);
-            System.out.println("==============================");
+        System.out.println("\n==============================================================");
+        System.out.println("Operation B - Delete");
+        System.out.println("==============================================================");
+        printHeader();
+        for (int N : NS) {
+            printDeleteRow(N);
+        }
 
-            runExperiment(N);
+        System.out.println("\n==============================================================");
+        System.out.println("Operation C - Search");
+        System.out.println("==============================================================");
+        printHeader();
+        for (int N : NS) {
+            printSearchRow(N);
+        }
+
+        System.out.println("\n==============================================================");
+        System.out.println("Operation D - Range Search");
+        System.out.println("==============================================================");
+        printHeader();
+        for (int N : NS) {
+            printRangeRow(N);
         }
     }
 
-    private static void runExperiment(int N){
+    private static void printInorderForN30() {
+        int N = 30;
 
         DynamicMemoryBST tree1 = new DynamicMemoryBST();
         ArrayBST tree2 = new ArrayBST(200000);
         SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(200000);
 
-        int[] initialKeys =
-                random.ints(1,2*N+1)
-                        .distinct()
-                        .limit(N)
-                        .toArray();
+        int[] initialKeys = random.ints(1, 2 * N + 1)
+                                  .distinct()
+                                  .limit(N)
+                                  .toArray();
 
-        for(int key : initialKeys){
-
+        for (int key : initialKeys) {
             tree1.insert(key);
             tree2.insert(key);
             tree3.insert(key);
         }
 
-        if(N == 30){
-
-            System.out.print("Dynamic BST inorder: ");
-            tree1.inorder();
-
-            System.out.print("Array BST inorder: ");
-            tree2.inorder();
-        }
-
-        int K = getK(N);
-
-        System.out.println("\nInsert measurements:");
-        measureInsert(tree1, tree2, tree3, N, K);
-
-        System.out.println("\nDelete measurements:");
-        measureDelete(tree1, tree2, tree3, N, K);
-
-        System.out.println("\nSearch measurements:");
-        measureSearch(tree1, tree2, tree3, N, K);
-
-        System.out.println("\nRangeSearch measurements:");
-        measureRange(tree1, tree2, tree3, N, K);
+        System.out.println("N = 30");
+        System.out.print("Dynamic Memory BST inorder: ");
+        tree1.inorder();
+        System.out.print("Array BST inorder: ");
+        tree2.inorder();
     }
 
-    private static int getK(int N){
+    private static void printHeader() {
+        System.out.println(
+            "N | DynOps | DynTime | DynLevels | ArrOps | ArrTime | ArrLevels | BinOps | BinTime | BinLevels"
+        );
+        System.out.println(
+            "----------------------------------------------------------------------------------------------------"
+        );
+    }
 
-        if(N < 201) return 20;
-        if(N < 1001) return 50;
+    private static int getK(int N) {
+        if (N < 201) {
+            return 20;
+        }
+        if (N < 1001) {
+            return 50;
+        }
         return 100;
     }
 
-    private static double avg(long total,int K){
-        return Math.round(((double)total / K) * 100.0) / 100.0;
-    }
+    private static String avg(long total, int K) {
+        double value = Math.round(((double) total / K) * 100.0) / 100.0;
+        String text = String.valueOf(value);
 
-    private static void printResults(
-            String name,
-            long time,
-            long ops,
-            long levels,
-            int K){
-
-        System.out.println(name + " mean time: " + avg(time,K));
-        System.out.println(name + " mean ops: " + avg(ops,K));
-        System.out.println(name + " mean levels: " + avg(levels,K));
-        System.out.println();
-    }
-
-    private static void measureInsert(
-            DynamicMemoryBST t1,
-            ArrayBST t2,
-            SortedArrayBinarySearch t3,
-            int N,
-            int K){
-
-        long time1=0,time2=0,time3=0;
-        long ops1=0,ops2=0,ops3=0;
-        long lev1=0,lev2=0,lev3=0;
-
-        int[] keys = random.ints(1,2*N+1).limit(K).toArray();
-
-        for(int key : keys){
-
-            t1.resetMetrics();
-            long start = System.nanoTime();
-            t1.insert(key);
-            time1 += System.nanoTime() - start;
-            ops1 += t1.getOperations();
-            lev1 += t1.getLevels();
-
-            t2.resetMetrics();
-            start = System.nanoTime();
-            t2.insert(key);
-            time2 += System.nanoTime() - start;
-            ops2 += t2.getOperations();
-            lev2 += t2.getLevels();
-
-            t3.resetMetrics();
-            start = System.nanoTime();
-            t3.insert(key);
-            time3 += System.nanoTime() - start;
-            ops3 += t3.getOperations();
-            lev3 += t3.getLevels();
+        if (!text.contains(".")) {
+            return text + ".00";
         }
 
-        printResults("Dynamic BST",time1,ops1,lev1,K);
-        printResults("Array BST",time2,ops2,lev2,K);
-        printResults("BinarySearch",time3,ops3,lev3,K);
-    }
+        int digitsAfterDot = text.length() - text.indexOf('.') - 1;
 
-    private static void measureDelete(
-            DynamicMemoryBST t1,
-            ArrayBST t2,
-            SortedArrayBinarySearch t3,
-            int N,
-            int K){
-
-        long time1=0,time2=0,time3=0;
-        long ops1=0,ops2=0,ops3=0;
-        long lev1=0,lev2=0,lev3=0;
-
-        int[] keys = random.ints(1,2*N+1).limit(K).toArray();
-
-        for(int key : keys){
-
-            t1.resetMetrics();
-            long start = System.nanoTime();
-            t1.delete(key);
-            time1 += System.nanoTime() - start;
-            ops1 += t1.getOperations();
-            lev1 += t1.getLevels();
-
-            t2.resetMetrics();
-            start = System.nanoTime();
-            t2.delete(key);
-            time2 += System.nanoTime() - start;
-            ops2 += t2.getOperations();
-            lev2 += t2.getLevels();
-
-            t3.resetMetrics();
-            start = System.nanoTime();
-            t3.delete(key);
-            time3 += System.nanoTime() - start;
-            ops3 += t3.getOperations();
-            lev3 += t3.getLevels();
+        if (digitsAfterDot == 0) {
+            return text + "00";
         }
 
-        printResults("Dynamic BST",time1,ops1,lev1,K);
-        printResults("Array BST",time2,ops2,lev2,K);
-        printResults("BinarySearch",time3,ops3,lev3,K);
-    }
-
-    private static void measureSearch(
-            DynamicMemoryBST t1,
-            ArrayBST t2,
-            SortedArrayBinarySearch t3,
-            int N,
-            int K){
-
-        long time1=0,time2=0,time3=0;
-        long ops1=0,ops2=0,ops3=0;
-        long lev1=0,lev2=0,lev3=0;
-
-        int[] keys = random.ints(1,2*N+1).limit(K).toArray();
-
-        for(int key : keys){
-
-            t1.resetMetrics();
-            long start = System.nanoTime();
-            t1.search(key);
-            time1 += System.nanoTime() - start;
-            ops1 += t1.getOperations();
-            lev1 += t1.getLevels();
-
-            t2.resetMetrics();
-            start = System.nanoTime();
-            t2.search(key);
-            time2 += System.nanoTime() - start;
-            ops2 += t2.getOperations();
-            lev2 += t2.getLevels();
-
-            t3.resetMetrics();
-            start = System.nanoTime();
-            t3.search(key);
-            time3 += System.nanoTime() - start;
-            ops3 += t3.getOperations();
-            lev3 += t3.getLevels();
+        if (digitsAfterDot == 1) {
+            return text + "0";
         }
 
-        printResults("Dynamic BST",time1,ops1,lev1,K);
-        printResults("Array BST",time2,ops2,lev2,K);
-        printResults("BinarySearch",time3,ops3,lev3,K);
+        return text;
     }
 
-    private static void measureRange(
-            DynamicMemoryBST t1,
-            ArrayBST t2,
-            SortedArrayBinarySearch t3,
-            int N,
-            int K){
+    private static ExperimentStructures buildStructures(int N) {
+        DynamicMemoryBST tree1 = new DynamicMemoryBST();
+        ArrayBST tree2 = new ArrayBST(200000);
+        SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(200000);
 
-        long time1=0,time2=0,time3=0;
-        long ops1=0,ops2=0,ops3=0;
-        long lev1=0,lev2=0,lev3=0;
+        int[] initialKeys = random.ints(1, 2 * N + 1)
+                                  .distinct()
+                                  .limit(N)
+                                  .toArray();
 
-        for(int i=0;i<K;i++){
-
-            int a = random.nextInt(2*N)+1;
-            int b = random.nextInt(2*N)+1;
-
-            int low = Math.min(a,b);
-            int high = Math.max(a,b);
-
-            t1.resetMetrics();
-            long start = System.nanoTime();
-            t1.rangeSearch(low,high);
-            time1 += System.nanoTime() - start;
-            ops1 += t1.getOperations();
-            lev1 += t1.getLevels();
-
-            t2.resetMetrics();
-            start = System.nanoTime();
-            t2.rangeSearch(low,high);
-            time2 += System.nanoTime() - start;
-            ops2 += t2.getOperations();
-            lev2 += t2.getLevels();
-
-            t3.resetMetrics();
-            start = System.nanoTime();
-            t3.rangeSearch(low,high);
-            time3 += System.nanoTime() - start;
-            ops3 += t3.getOperations();
-            lev3 += t3.getLevels();
+        for (int key : initialKeys) {
+            tree1.insert(key);
+            tree2.insert(key);
+            tree3.insert(key);
         }
 
-        printResults("Dynamic BST",time1,ops1,lev1,K);
-        printResults("Array BST",time2,ops2,lev2,K);
-        printResults("BinarySearch",time3,ops3,lev3,K);
+        return new ExperimentStructures(tree1, tree2, tree3);
+    }
+
+    private static void printInsertRow(int N) {
+        int K = getK(N);
+        ExperimentStructures s = buildStructures(N);
+
+        long time1 = 0, time2 = 0, time3 = 0;
+        long ops1 = 0, ops2 = 0, ops3 = 0;
+        long lev1 = 0, lev2 = 0, lev3 = 0;
+
+        int[] keys = random.ints(1, 2 * N + 1).limit(K).toArray();
+
+        for (int key : keys) {
+            s.tree1.resetMetrics();
+            long start = System.nanoTime();
+            s.tree1.insert(key);
+            time1 += System.nanoTime() - start;
+            ops1 += s.tree1.getOperations();
+            lev1 += s.tree1.getLevels();
+
+            s.tree2.resetMetrics();
+            start = System.nanoTime();
+            s.tree2.insert(key);
+            time2 += System.nanoTime() - start;
+            ops2 += s.tree2.getOperations();
+            lev2 += s.tree2.getLevels();
+
+            s.tree3.resetMetrics();
+            start = System.nanoTime();
+            s.tree3.insert(key);
+            time3 += System.nanoTime() - start;
+            ops3 += s.tree3.getOperations();
+            lev3 += s.tree3.getLevels();
+        }
+
+        printRow(N, time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
+    }
+
+    private static void printDeleteRow(int N) {
+        int K = getK(N);
+        ExperimentStructures s = buildStructures(N);
+
+        long time1 = 0, time2 = 0, time3 = 0;
+        long ops1 = 0, ops2 = 0, ops3 = 0;
+        long lev1 = 0, lev2 = 0, lev3 = 0;
+
+        int[] keys = random.ints(1, 2 * N + 1).limit(K).toArray();
+
+        for (int key : keys) {
+            s.tree1.resetMetrics();
+            long start = System.nanoTime();
+            s.tree1.delete(key);
+            time1 += System.nanoTime() - start;
+            ops1 += s.tree1.getOperations();
+            lev1 += s.tree1.getLevels();
+
+            s.tree2.resetMetrics();
+            start = System.nanoTime();
+            s.tree2.delete(key);
+            time2 += System.nanoTime() - start;
+            ops2 += s.tree2.getOperations();
+            lev2 += s.tree2.getLevels();
+
+            s.tree3.resetMetrics();
+            start = System.nanoTime();
+            s.tree3.delete(key);
+            time3 += System.nanoTime() - start;
+            ops3 += s.tree3.getOperations();
+            lev3 += s.tree3.getLevels();
+        }
+
+        printRow(N, time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
+    }
+
+    private static void printSearchRow(int N) {
+        int K = getK(N);
+        ExperimentStructures s = buildStructures(N);
+
+        long time1 = 0, time2 = 0, time3 = 0;
+        long ops1 = 0, ops2 = 0, ops3 = 0;
+        long lev1 = 0, lev2 = 0, lev3 = 0;
+
+        int[] keys = random.ints(1, 2 * N + 1).limit(K).toArray();
+
+        for (int key : keys) {
+            s.tree1.resetMetrics();
+            long start = System.nanoTime();
+            s.tree1.search(key);
+            time1 += System.nanoTime() - start;
+            ops1 += s.tree1.getOperations();
+            lev1 += s.tree1.getLevels();
+
+            s.tree2.resetMetrics();
+            start = System.nanoTime();
+            s.tree2.search(key);
+            time2 += System.nanoTime() - start;
+            ops2 += s.tree2.getOperations();
+            lev2 += s.tree2.getLevels();
+
+            s.tree3.resetMetrics();
+            start = System.nanoTime();
+            s.tree3.search(key);
+            time3 += System.nanoTime() - start;
+            ops3 += s.tree3.getOperations();
+            lev3 += s.tree3.getLevels();
+        }
+
+        printRow(N, time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
+    }
+
+    private static void printRangeRow(int N) {
+        int K = getK(N);
+        ExperimentStructures s = buildStructures(N);
+
+        long time1 = 0, time2 = 0, time3 = 0;
+        long ops1 = 0, ops2 = 0, ops3 = 0;
+        long lev1 = 0, lev2 = 0, lev3 = 0;
+
+        for (int i = 0; i < K; i++) {
+            int a = random.nextInt(2 * N) + 1;
+            int b = random.nextInt(2 * N) + 1;
+            int low = Math.min(a, b);
+            int high = Math.max(a, b);
+
+            s.tree1.resetMetrics();
+            long start = System.nanoTime();
+            s.tree1.rangeSearch(low, high);
+            time1 += System.nanoTime() - start;
+            ops1 += s.tree1.getOperations();
+            lev1 += s.tree1.getLevels();
+
+            s.tree2.resetMetrics();
+            start = System.nanoTime();
+            s.tree2.rangeSearch(low, high);
+            time2 += System.nanoTime() - start;
+            ops2 += s.tree2.getOperations();
+            lev2 += s.tree2.getLevels();
+
+            s.tree3.resetMetrics();
+            start = System.nanoTime();
+            s.tree3.rangeSearch(low, high);
+            time3 += System.nanoTime() - start;
+            ops3 += s.tree3.getOperations();
+            lev3 += s.tree3.getLevels();
+        }
+
+        printRow(N, time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
+    }
+
+    private static void printRow(
+            int N,
+            long time1, long ops1, long lev1,
+            long time2, long ops2, long lev2,
+            long time3, long ops3, long lev3,
+            int K) {
+
+        String row =
+            N + " | " +
+            avg(ops1, K) + " | " +
+            avg(time1, K) + " | " +
+            avg(lev1, K) + " | " +
+            avg(ops2, K) + " | " +
+            avg(time2, K) + " | " +
+            avg(lev2, K) + " | " +
+            avg(ops3, K) + " | " +
+            avg(time3, K) + " | " +
+            avg(lev3, K);
+
+        System.out.println(row);
+    }
+
+    private static class ExperimentStructures {
+        DynamicMemoryBST tree1;
+        ArrayBST tree2;
+        SortedArrayBinarySearch tree3;
+
+        ExperimentStructures(DynamicMemoryBST tree1, ArrayBST tree2, SortedArrayBinarySearch tree3) {
+            this.tree1 = tree1;
+            this.tree2 = tree2;
+            this.tree3 = tree3;
+        }
     }
 }
