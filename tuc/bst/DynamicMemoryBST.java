@@ -1,4 +1,4 @@
-package Tuc.bst;
+package bst;
 
 import java.util.ArrayList;
 import java.util.List;

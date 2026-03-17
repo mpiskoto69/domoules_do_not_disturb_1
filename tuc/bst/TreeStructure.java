@@ -1,4 +1,4 @@
-package Tuc.bst;
+package bst;
 
 public interface TreeStructure extends SearchStructure {
 
