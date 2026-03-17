@@ -1,4 +1,4 @@
-package tuc.bst;
+package Tuc.bst;
 
 public class MainBSTTest {
 

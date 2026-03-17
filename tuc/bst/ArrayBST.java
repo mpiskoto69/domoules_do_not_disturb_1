@@ -1,53 +1,40 @@
-package tuc.bst;
+package Tuc.bst;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Υλοποίηση BST με χρήση δισδιάστατου πίνακα Kx3.
- *
- * table[i][0] = key του κόμβου στη γραμμή i
- * table[i][1] = γραμμή αριστερού παιδιού
- * table[i][2] = γραμμή δεξιού παιδιού
- *
- * Όταν μια γραμμή είναι ελεύθερη, το table[i][2] χρησιμοποιείται
- * για να δείχνει στην επόμενη ελεύθερη γραμμή της free list.
- *
- * Η τιμή -1 σημαίνει "δεν υπάρχει".
- */
 public class ArrayBST implements TreeStructure {
 
+    private static final int INFO = 0;
+    private static final int LEFT = 1;
+    private static final int RIGHT = 2;
+    private static final int NULL = -1;
+
     private int[][] table; // K x 3
-    private int root;      // γραμμή ρίζας
-    private int avail;     // πρώτη ελεύθερη γραμμή
-    private int size;      // πλήθος ενεργών κόμβων
-    private int capacity;  // πλήθος γραμμών
+    private int root;
+    private int avail;
+    private int size;
+    private int capacity;
 
     public ArrayBST(int capacity) {
         this.capacity = capacity;
         this.table = new int[capacity][3];
 
         initializeFreeList();
-        root = -1;
+        root = NULL;
         size = 0;
     }
 
-    /*
-     * Αρχικοποιεί όλες τις γραμμές ως ελεύθερες:
-     * 0 -> 1 -> 2 -> ... -> capacity-1 -> -1
-     *
-     * Η σύνδεση των free nodes γίνεται μέσω της 3ης στήλης.
-     */
     private void initializeFreeList() {
         avail = 0;
 
         for (int i = 0; i < capacity; i++) {
-            table[i][0] = -1;      // key
-            table[i][1] = -1;      // left child
-            table[i][2] = i + 1;   // next free line
+            table[i][INFO] = NULL;
+            table[i][LEFT] = NULL;
+            table[i][RIGHT] = i + 1;
         }
 
-        table[capacity - 1][2] = -1;
+        table[capacity - 1][RIGHT] = NULL;
     }
 
     @Override
@@ -55,74 +42,68 @@ public class ArrayBST implements TreeStructure {
         System.out.println("BST Array");
     }
 
-    /*
-     * Παίρνει την πρώτη διαθέσιμη ελεύθερη γραμμή.
-     */
     private int getNode() {
-        if (avail == -1) {
-            return -1;
+        if (avail == NULL) {
+            return NULL;
         }
 
         int newNode = avail;
-        avail = table[avail][2];
+        avail = table[avail][RIGHT];
 
-        table[newNode][1] = -1;
-        table[newNode][2] = -1;
+        table[newNode][INFO] = NULL;
+        table[newNode][LEFT] = NULL;
+        table[newNode][RIGHT] = NULL;
 
         return newNode;
     }
 
-    /*
-     * Επιστρέφει μια γραμμή στη free list.
-     */
     private void freeNode(int line) {
-        table[line][0] = -1;
-        table[line][1] = -1;
-        table[line][2] = avail;
+        table[line][INFO] = NULL;
+        table[line][LEFT] = NULL;
+        table[line][RIGHT] = avail;
         avail = line;
     }
 
     @Override
     public void insert(int key) {
-        if (root == -1) {
+        if (root == NULL) {
             int newNode = getNode();
-            if (newNode == -1) {
+            if (newNode == NULL) {
                 throw new IllegalStateException("Το ArrayBST είναι γεμάτο.");
             }
 
-            table[newNode][0] = key;
+            table[newNode][INFO] = key;
             root = newNode;
             size++;
             return;
         }
 
         int current = root;
-        int parent = -1;
+        int parent = NULL;
 
-        while (current != -1) {
+        while (current != NULL) {
             parent = current;
 
-            if (key < table[current][0]) {
-                current = table[current][1];
-            } else if (key > table[current][0]) {
-                current = table[current][2];
+            if (key < table[current][INFO]) {
+                current = table[current][LEFT];
+            } else if (key > table[current][INFO]) {
+                current = table[current][RIGHT];
             } else {
-                // duplicate key, δεν ξαναεισάγεται
                 return;
             }
         }
 
         int newNode = getNode();
-        if (newNode == -1) {
+        if (newNode == NULL) {
             throw new IllegalStateException("Το ArrayBST είναι γεμάτο.");
         }
 
-        table[newNode][0] = key;
+        table[newNode][INFO] = key;
 
-        if (key < table[parent][0]) {
-            table[parent][1] = newNode;
+        if (key < table[parent][INFO]) {
+            table[parent][LEFT] = newNode;
         } else {
-            table[parent][2] = newNode;
+            table[parent][RIGHT] = newNode;
         }
 
         size++;
@@ -132,13 +113,13 @@ public class ArrayBST implements TreeStructure {
     public int search(int key) {
         int current = root;
 
-        while (current != -1) {
-            if (key == table[current][0]) {
-                return table[current][0];
-            } else if (key < table[current][0]) {
-                current = table[current][1];
+        while (current != NULL) {
+            if (key == table[current][INFO]) {
+                return table[current][INFO];
+            } else if (key < table[current][INFO]) {
+                current = table[current][LEFT];
             } else {
-                current = table[current][2];
+                current = table[current][RIGHT];
             }
         }
 
@@ -147,46 +128,39 @@ public class ArrayBST implements TreeStructure {
 
     @Override
     public boolean delete(int key) {
-        if (root == -1) {
+        if (root == NULL) {
             return false;
         }
 
         int current = root;
-        int parent = -1;
+        int parent = NULL;
 
-        while (current != -1 && table[current][0] != key) {
+        while (current != NULL && table[current][INFO] != key) {
             parent = current;
 
-            if (key < table[current][0]) {
-                current = table[current][1];
+            if (key < table[current][INFO]) {
+                current = table[current][LEFT];
             } else {
-                current = table[current][2];
+                current = table[current][RIGHT];
             }
         }
 
-        if (current == -1) {
+        if (current == NULL) {
             return false;
         }
 
-        int leftChild = table[current][1];
-        int rightChild = table[current][2];
+        int leftChild = table[current][LEFT];
+        int rightChild = table[current][RIGHT];
 
-        // Περίπτωση 1 ή 2: έχει 0 ή 1 παιδί
-        if (leftChild == -1 || rightChild == -1) {
-            int child;
+        if (leftChild == NULL || rightChild == NULL) {
+            int child = (leftChild != NULL) ? leftChild : rightChild;
 
-            if (leftChild != -1) {
-                child = leftChild;
-            } else {
-                child = rightChild;
-            }
-
-            if (parent == -1) {
+            if (parent == NULL) {
                 root = child;
-            } else if (table[parent][1] == current) {
-                table[parent][1] = child;
+            } else if (table[parent][LEFT] == current) {
+                table[parent][LEFT] = child;
             } else {
-                table[parent][2] = child;
+                table[parent][RIGHT] = child;
             }
 
             freeNode(current);
@@ -194,25 +168,22 @@ public class ArrayBST implements TreeStructure {
             return true;
         }
 
-        // Περίπτωση 3: δύο παιδιά
         int successorParent = current;
-        int successor = table[current][2];
+        int successor = table[current][RIGHT];
 
-        while (table[successor][1] != -1) {
+        while (table[successor][LEFT] != NULL) {
             successorParent = successor;
-            successor = table[successor][1];
+            successor = table[successor][LEFT];
         }
 
-        // αντιγραφή μόνο του key
-        table[current][0] = table[successor][0];
+        table[current][INFO] = table[successor][INFO];
 
-        // ο successor έχει το πολύ ένα παιδί: δεξί
-        int successorChild = table[successor][2];
+        int successorChild = table[successor][RIGHT];
 
-        if (table[successorParent][1] == successor) {
-            table[successorParent][1] = successorChild;
+        if (table[successorParent][LEFT] == successor) {
+            table[successorParent][LEFT] = successorChild;
         } else {
-            table[successorParent][2] = successorChild;
+            table[successorParent][RIGHT] = successorChild;
         }
 
         freeNode(successor);
@@ -227,24 +198,21 @@ public class ArrayBST implements TreeStructure {
         return result;
     }
 
-    /*
-     * Αναζήτηση εύρους τιμών με pruning.
-     */
     private void rangeSearchRec(int node, int low, int high, List<Integer> result) {
-        if (node == -1) {
+        if (node == NULL) {
             return;
         }
 
-        if (low < table[node][0]) {
-            rangeSearchRec(table[node][1], low, high, result);
+        if (low < table[node][INFO]) {
+            rangeSearchRec(table[node][LEFT], low, high, result);
         }
 
-        if (low <= table[node][0] && table[node][0] <= high) {
-            result.add(table[node][0]);
+        if (low <= table[node][INFO] && table[node][INFO] <= high) {
+            result.add(table[node][INFO]);
         }
 
-        if (table[node][0] < high) {
-            rangeSearchRec(table[node][2], low, high, result);
+        if (table[node][INFO] < high) {
+            rangeSearchRec(table[node][RIGHT], low, high, result);
         }
     }
 
@@ -254,17 +222,23 @@ public class ArrayBST implements TreeStructure {
         System.out.println();
     }
 
-    /*
-     * Inorder διάσχιση: αριστερά - ρίζα - δεξιά
-     */
     private void inorderRec(int node) {
-        if (node == -1) {
+        if (node == NULL) {
             return;
         }
 
-        inorderRec(table[node][1]);
-        System.out.print(table[node][0] + " ");
-        inorderRec(table[node][2]);
+        inorderRec(table[node][LEFT]);
+        System.out.print(table[node][INFO] + " ");
+        inorderRec(table[node][RIGHT]);
+    }
+
+    public void printTable() {
+        System.out.println("root = " + root + ", avail = " + avail);
+        System.out.println("Line\tInfo\tLeft\tRight");
+
+        for (int i = 0; i < capacity; i++) {
+            System.out.println(i + "\t" + table[i][INFO] + "\t" + table[i][LEFT] + "\t" + table[i][RIGHT]);
+        }
     }
 
     public int size() {
