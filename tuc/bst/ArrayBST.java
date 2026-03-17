@@ -1,3 +1,5 @@
+
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,11 +10,14 @@ public class ArrayBST implements TreeStructure {
     private static final int RIGHT = 2;
     private static final int NULL = -1;
 
-    private int[][] table; // K x 3
+    private int[][] table;
     private int root;
     private int avail;
     private int size;
     private int capacity;
+
+    private int levels;
+    private int operations;
 
     public ArrayBST(int capacity) {
         this.capacity = capacity;
@@ -21,6 +26,20 @@ public class ArrayBST implements TreeStructure {
         initializeFreeList();
         root = NULL;
         size = 0;
+        resetMetrics();
+    }
+
+    public void resetMetrics() {
+        levels = 0;
+        operations = 0;
+    }
+
+    public int getLevels() {
+        return levels;
+    }
+
+    public int getOperations() {
+        return operations;
     }
 
     private void initializeFreeList() {
@@ -70,6 +89,9 @@ public class ArrayBST implements TreeStructure {
                 throw new IllegalStateException("Το ArrayBST είναι γεμάτο.");
             }
 
+            operations++;
+            levels = 1;
+
             table[newNode][INFO] = key;
             root = newNode;
             size++;
@@ -80,14 +102,20 @@ public class ArrayBST implements TreeStructure {
         int parent = NULL;
 
         while (current != NULL) {
+            levels++;
+            operations++;
             parent = current;
 
+            operations++;
             if (key < table[current][INFO]) {
                 current = table[current][LEFT];
-            } else if (key > table[current][INFO]) {
-                current = table[current][RIGHT];
             } else {
-                return;
+                operations++;
+                if (key > table[current][INFO]) {
+                    current = table[current][RIGHT];
+                } else {
+                    return; // duplicate
+                }
             }
         }
 
@@ -98,6 +126,7 @@ public class ArrayBST implements TreeStructure {
 
         table[newNode][INFO] = key;
 
+        operations++;
         if (key < table[parent][INFO]) {
             table[parent][LEFT] = newNode;
         } else {
@@ -112,9 +141,15 @@ public class ArrayBST implements TreeStructure {
         int current = root;
 
         while (current != NULL) {
+            levels++;
+            operations++;
+
             if (key == table[current][INFO]) {
                 return table[current][INFO];
-            } else if (key < table[current][INFO]) {
+            }
+
+            operations++;
+            if (key < table[current][INFO]) {
                 current = table[current][LEFT];
             } else {
                 current = table[current][RIGHT];
@@ -134,8 +169,12 @@ public class ArrayBST implements TreeStructure {
         int parent = NULL;
 
         while (current != NULL && table[current][INFO] != key) {
+            levels++;
+            operations++;
+
             parent = current;
 
+            operations++;
             if (key < table[current][INFO]) {
                 current = table[current][LEFT];
             } else {
@@ -147,10 +186,15 @@ public class ArrayBST implements TreeStructure {
             return false;
         }
 
+        levels++;
+
         int leftChild = table[current][LEFT];
         int rightChild = table[current][RIGHT];
 
+        // 0 ή 1 παιδί
         if (leftChild == NULL || rightChild == NULL) {
+            operations++;
+
             int child = (leftChild != NULL) ? leftChild : rightChild;
 
             if (parent == NULL) {
@@ -166,15 +210,19 @@ public class ArrayBST implements TreeStructure {
             return true;
         }
 
+        // 2 παιδιά
         int successorParent = current;
         int successor = table[current][RIGHT];
 
         while (table[successor][LEFT] != NULL) {
+            levels++;
+            operations++;
             successorParent = successor;
             successor = table[successor][LEFT];
         }
 
         table[current][INFO] = table[successor][INFO];
+        operations++;
 
         int successorChild = table[successor][RIGHT];
 
@@ -201,14 +249,19 @@ public class ArrayBST implements TreeStructure {
             return;
         }
 
+        levels++;
+        operations++;
+
         if (low < table[node][INFO]) {
             rangeSearchRec(table[node][LEFT], low, high, result);
         }
 
+        operations++;
         if (low <= table[node][INFO] && table[node][INFO] <= high) {
             result.add(table[node][INFO]);
         }
 
+        operations++;
         if (table[node][INFO] < high) {
             rangeSearchRec(table[node][RIGHT], low, high, result);
         }

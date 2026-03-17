@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+        "type": "java",
+        "name": "ExperimentRunner",
+        "request": "launch",
+        "mainClass": "ExperimentRunner",
+        "projectName": "tuc_5e1a4522"
+    },
+    {
+        "type": "java",
+        "name": "Launch ExperimentRunner",
+        "request": "launch",
+        "mainClass": "tuc.bst.ExperimentRunner",
+        "vmArgs": "-Xint"
+    }
+]
+}

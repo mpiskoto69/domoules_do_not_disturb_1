@@ -2,16 +2,29 @@
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Υλοποίηση BST με κλασική δυναμική παραχώρηση μνήμης.
- * Κάθε κόμβος είναι αντικείμενο TreeNode με left/right references.
- */
 public class DynamicMemoryBST implements TreeStructure {
 
     private TreeNode root;
 
+    private int levels;
+    private int operations;
+
     public DynamicMemoryBST() {
         root = null;
+        resetMetrics();
+    }
+
+    public void resetMetrics() {
+        levels = 0;
+        operations = 0;
+    }
+
+    public int getLevels() {
+        return levels;
+    }
+
+    public int getOperations() {
+        return operations;
     }
 
     @Override
@@ -21,109 +34,128 @@ public class DynamicMemoryBST implements TreeStructure {
 
     @Override
     public void insert(int key) {
-        root = insertRec(root, key);
-    }
-
-    /*
-     * Εισαγωγή σε BST.
-     * Αν το key υπάρχει ήδη, δεν ξαναεισάγεται.
-     */
-    private TreeNode insertRec(TreeNode node, int key) {
-        if (node == null) {
-            return new TreeNode(key);
+        if (root == null) {
+            operations++;
+            root = new TreeNode(key);
+            levels = 1;
+            return;
         }
 
-        if (key < node.key) {
-            node.left = insertRec(node.left, key);
-        } else if (key > node.key) {
-            node.right = insertRec(node.right, key);
-        }
-        // Αν key == node.key, δεν κάνουμε τίποτα.
+        TreeNode current = root;
+        TreeNode parent = null;
 
-        return node;
+        while (current != null) {
+            levels++;
+            operations++;
+            parent = current;
+
+            operations++;
+            if (key < current.key) {
+                current = current.left;
+            } else {
+                operations++;
+                if (key > current.key) {
+                    current = current.right;
+                } else {
+                    return; // duplicate
+                }
+            }
+        }
+
+        operations++;
+        if (key < parent.key) {
+            parent.left = new TreeNode(key);
+        } else {
+            parent.right = new TreeNode(key);
+        }
     }
 
     @Override
     public int search(int key) {
-        TreeNode found = searchRec(root, key);
-        return (found == null) ? -1 : found.key;
-    }
+        TreeNode current = root;
 
-    /*
-     * Κλασική αναζήτηση σε BST.
-     */
-    private TreeNode searchRec(TreeNode node, int key) {
-        if (node == null) {
-            return null;
+        while (current != null) {
+            levels++;
+            operations++;
+
+            if (key == current.key) {
+                return current.key;
+            }
+
+            operations++;
+            if (key < current.key) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
         }
 
-        if (key == node.key) {
-            return node;
-        }
-
-        if (key < node.key) {
-            return searchRec(node.left, key);
-        }
-
-        return searchRec(node.right, key);
+        return -1;
     }
 
     @Override
     public boolean delete(int key) {
-        if (search(key) == -1) {
+        TreeNode current = root;
+        TreeNode parent = null;
+
+        while (current != null && current.key != key) {
+            levels++;
+            operations++;
+
+            parent = current;
+
+            operations++;
+            if (key < current.key) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+
+        if (current == null) {
             return false;
         }
 
-        root = deleteRec(root, key);
-        return true;
-    }
+        levels++;
 
-    /*
-     * Διαγραφή κόμβου από BST.
-     * Περιπτώσεις:
-     * 1) φύλλο
-     * 2) ένας απόγονος
-     * 3) δύο απόγονοι
-     */
-    private TreeNode deleteRec(TreeNode node, int key) {
-        if (node == null) {
-            return null;
+        // 0 ή 1 παιδί
+        if (current.left == null || current.right == null) {
+            operations++;
+
+            TreeNode child = (current.left != null) ? current.left : current.right;
+
+            if (parent == null) {
+                root = child;
+            } else if (parent.left == current) {
+                parent.left = child;
+            } else {
+                parent.right = child;
+            }
+
+            return true;
         }
 
-        if (key < node.key) {
-            node.left = deleteRec(node.left, key);
-        } else if (key > node.key) {
-            node.right = deleteRec(node.right, key);
+        // 2 παιδιά
+        TreeNode successorParent = current;
+        TreeNode successor = current.right;
+
+        while (successor.left != null) {
+            levels++;
+            operations++;
+            successorParent = successor;
+            successor = successor.left;
+        }
+
+        current.key = successor.key;
+        operations++;
+
+        if (successorParent.left == successor) {
+            successorParent.left = successor.right;
         } else {
-            // Βρέθηκε ο κόμβος προς διαγραφή
-
-            // Περίπτωση 1 ή 2
-            if (node.left == null) {
-                return node.right;
-            }
-
-            if (node.right == null) {
-                return node.left;
-            }
-
-            // Περίπτωση 3: δύο παιδιά
-            TreeNode minNode = findMin(node.right);
-            node.key = minNode.key;
-            node.right = deleteRec(node.right, minNode.key);
+            successorParent.right = successor.right;
         }
 
-        return node;
-    }
-
-    /*
-     * Επιστρέφει τον κόμβο με το μικρότερο key σε ένα υποδέντρο.
-     * Πηγαίνουμε συνεχώς αριστερά.
-     */
-    private TreeNode findMin(TreeNode node) {
-        while (node.left != null) {
-            node = node.left;
-        }
-        return node;
+        return true;
     }
 
     @Override
@@ -133,23 +165,24 @@ public class DynamicMemoryBST implements TreeStructure {
         return result;
     }
 
-    /*
-     * Αναζήτηση όλων των keys στο διάστημα [low, high].
-     * Εκμεταλλευόμαστε την ιδιότητα του BST για να κόβουμε άχρηστα κλαδιά.
-     */
     private void rangeSearchRec(TreeNode node, int low, int high, List<Integer> result) {
         if (node == null) {
             return;
         }
 
+        levels++;
+        operations++;
+
         if (low < node.key) {
             rangeSearchRec(node.left, low, high, result);
         }
 
+        operations++;
         if (low <= node.key && node.key <= high) {
             result.add(node.key);
         }
 
+        operations++;
         if (node.key < high) {
             rangeSearchRec(node.right, low, high, result);
         }
@@ -161,11 +194,6 @@ public class DynamicMemoryBST implements TreeStructure {
         System.out.println();
     }
 
-    /*
-     * Inorder διάσχιση:
-     * αριστερά - ρίζα - δεξιά
-     * Σε BST τυπώνει τα keys σε αύξουσα σειρά.
-     */
     private void inorderRec(TreeNode node) {
         if (node == null) {
             return;

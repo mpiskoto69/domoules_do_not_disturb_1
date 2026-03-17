@@ -1,13 +1,7 @@
+
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Υλοποίηση δομής δυαδικής αναζήτησης με χρήση
- * μονοδιάστατου ταξινομημένου πίνακα.
- *
- * Ο πίνακας παραμένει πάντα ταξινομημένος.
- * Δεν επιτρέπονται διπλότυπα κλειδιά.
- */
 public class SortedArrayBinarySearch implements SearchStructure {
 
     private static final int NOT_FOUND = -1;
@@ -16,10 +10,27 @@ public class SortedArrayBinarySearch implements SearchStructure {
     private int size;
     private int capacity;
 
+    private int levels;
+    private int operations;
+
     public SortedArrayBinarySearch(int capacity) {
         this.capacity = capacity;
         this.array = new int[capacity];
         this.size = 0;
+        resetMetrics();
+    }
+
+    public void resetMetrics() {
+        levels = 0;
+        operations = 0;
+    }
+
+    public int getLevels() {
+        return levels;
+    }
+
+    public int getOperations() {
+        return operations;
     }
 
     @Override
@@ -27,46 +38,34 @@ public class SortedArrayBinarySearch implements SearchStructure {
         System.out.println("Binary Search");
     }
 
-    /*
-     * Επιστρέφει το key αν βρεθεί, αλλιώς -1.
-     */
     @Override
     public int search(int key) {
         int index = binarySearchIndex(key);
         return (index == NOT_FOUND) ? NOT_FOUND : array[index];
     }
 
-    /*
-     * Εισαγωγή νέου κλειδιού στον ταξινομημένο πίνακα.
-     * Αν το κλειδί υπάρχει ήδη, δεν ξαναεισάγεται.
-     */
     @Override
     public void insert(int key) {
         if (size == capacity) {
             throw new IllegalStateException("Ο πίνακας είναι γεμάτος.");
         }
 
-        // Αν υπάρχει ήδη, δεν κάνουμε τίποτα
         if (binarySearchIndex(key) != NOT_FOUND) {
-            return;
+            return; // duplicate
         }
 
-        // Βρες τη σωστή θέση εισαγωγής
         int position = findInsertPosition(key);
 
-        // Μετακίνησε όλα τα μεγαλύτερα στοιχεία μία θέση δεξιά
         for (int i = size; i > position; i--) {
+            operations++;
             array[i] = array[i - 1];
         }
 
+        operations++;
         array[position] = key;
         size++;
     }
 
-    /*
-     * Διαγραφή κλειδιού.
-     * Επιστρέφει true αν διαγράφηκε, false αν δεν βρέθηκε.
-     */
     @Override
     public boolean delete(int key) {
         int position = binarySearchIndex(key);
@@ -75,8 +74,8 @@ public class SortedArrayBinarySearch implements SearchStructure {
             return false;
         }
 
-        // Μετακίνηση αριστερά για να κλείσει το κενό
         for (int i = position; i < size - 1; i++) {
+            operations++;
             array[i] = array[i + 1];
         }
 
@@ -84,9 +83,6 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return true;
     }
 
-    /*
-     * Επιστρέφει λίστα με όλα τα κλειδιά στο διάστημα [low, high].
-     */
     @Override
     public List<Integer> rangeSearch(int low, int high) {
         List<Integer> result = new ArrayList<>();
@@ -95,36 +91,36 @@ public class SortedArrayBinarySearch implements SearchStructure {
             return result;
         }
 
-        // Βρες το πρώτο στοιχείο που είναι >= low
         int start = findFirstGreaterOrEqual(low);
 
         if (start == size) {
             return result;
         }
 
-        // Πρόσθεσε στοιχεία μέχρι να ξεπεράσουμε το high
         for (int i = start; i < size && array[i] <= high; i++) {
+            levels++;
+            operations++;
             result.add(array[i]);
         }
 
         return result;
     }
 
-    /*
-     * Κλασικό binary search που επιστρέφει index.
-     * Αν δεν βρεθεί το key, επιστρέφει -1.
-     */
     private int binarySearchIndex(int key) {
         int left = 0;
         int right = size - 1;
 
         while (left <= right) {
+            levels++;
+            operations++;
+
             int mid = left + (right - left) / 2;
 
             if (array[mid] == key) {
                 return mid;
             }
 
+            operations++;
             if (key < array[mid]) {
                 right = mid - 1;
             } else {
@@ -135,16 +131,15 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return NOT_FOUND;
     }
 
-    /*
-     * Βρίσκει τη θέση όπου πρέπει να εισαχθεί το key,
-     * ώστε ο πίνακας να παραμείνει ταξινομημένος.
-     */
     private int findInsertPosition(int key) {
         int left = 0;
         int right = size - 1;
         int answer = size;
 
         while (left <= right) {
+            levels++;
+            operations++;
+
             int mid = left + (right - left) / 2;
 
             if (array[mid] > key) {
@@ -158,16 +153,15 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return answer;
     }
 
-    /*
-     * Βρίσκει το πρώτο index i τέτοιο ώστε array[i] >= value.
-     * Αν δεν υπάρχει τέτοιο στοιχείο, επιστρέφει size.
-     */
     private int findFirstGreaterOrEqual(int value) {
         int left = 0;
         int right = size - 1;
         int answer = size;
 
         while (left <= right) {
+            levels++;
+            operations++;
+
             int mid = left + (right - left) / 2;
 
             if (array[mid] >= value) {
@@ -181,10 +175,6 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return answer;
     }
 
-    /*
-     * Εκτυπώνει τον πίνακα μέχρι το size.
-     * Χρήσιμο για testing/debugging.
-     */
     public void printArray() {
         for (int i = 0; i < size; i++) {
             System.out.print(array[i] + " ");
