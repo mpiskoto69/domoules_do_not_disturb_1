@@ -43,30 +43,34 @@ public class ExperimentRunner {
         }
     }
 
-    private static void printInorderForN30() {
-        int N = 30;
+   private static void printInorderForN30() {
+    int N = 30;
 
-        DynamicMemoryBST tree1 = new DynamicMemoryBST();
-        ArrayBST tree2 = new ArrayBST(200000);
-        SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(200000);
+    DynamicMemoryBST tree1 = new DynamicMemoryBST();
+    ArrayBST tree2 = new ArrayBST(200000);
+    SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(200000);
 
-        int[] initialKeys = random.ints(1, 2 * N + 1)
-                .distinct()
-                .limit(N)
-                .toArray();
+    int[] initialKeys = random.ints(1, 2 * N + 1)
+            .distinct()
+            .limit(N)
+            .toArray();
 
-        for (int key : initialKeys) {
-            tree1.insert(key);
-            tree2.insert(key);
-            tree3.insert(key);
-        }
-
-        System.out.println("N = 30");
-        System.out.print("Dynamic Memory BST inorder: ");
-        tree1.inorder();
-        System.out.print("Array BST inorder: ");
-        tree2.inorder();
+    for (int key : initialKeys) {
+        tree1.insert(key);
+        tree2.insert(key);
+        tree3.insert(key);
     }
+
+    System.out.println("N = 30");
+
+    tree1.printName();
+    System.out.print("Inorder traversal: ");
+    tree1.inorder();
+
+    tree2.printName();
+    System.out.print("Inorder traversal: ");
+    tree2.inorder();
+}
 
     private static void printHeader() {
         System.out.println(
