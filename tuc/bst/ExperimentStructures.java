@@ -1,4 +1,4 @@
-  private class ExperimentStructures {
+  class ExperimentStructures {
         DynamicMemoryBST tree1;
         ArrayBST tree2;
         SortedArrayBinarySearch tree3;
