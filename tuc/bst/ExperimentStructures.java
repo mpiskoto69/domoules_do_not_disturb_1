@@ -1,4 +1,4 @@
-  class ExperimentStructures {
+  public class ExperimentStructures {
         DynamicMemoryBST tree1;
         ArrayBST tree2;
         SortedArrayBinarySearch tree3;
