@@ -1,5 +1,9 @@
 
+/**
+ * Node used by the dynamic-memory BST.
+ */
 public class TreeNode {
+
     int key;
     TreeNode left;
     TreeNode right;

@@ -4,12 +4,23 @@ import java.util.List;
 
 public class ArrayBST implements TreeStructure {
 
+    // Row identifiers in the 3 x K table
     private static final int INFO = 0;
     private static final int LEFT = 1;
     private static final int RIGHT = 2;
+
     private static final int NULL = -1;
 
+    /*
+     * 3 x K representation:
+     * table[INFO][i]  -> key stored at node i
+     * table[LEFT][i]  -> index of left child of node i
+     * table[RIGHT][i] -> index of right child of node i
+     *
+     * For free nodes, table[RIGHT][i] is used to link the free-list.
+     */
     private int[][] table;
+
     private int root;
     private int avail;
     private int size;
@@ -20,7 +31,7 @@ public class ArrayBST implements TreeStructure {
 
     public ArrayBST(int capacity) {
         this.capacity = capacity;
-        this.table = new int[capacity][3];
+        this.table = new int[3][capacity]; // 3 x K, as suggested in the assignment
 
         initializeFreeList();
         root = NULL;
@@ -28,6 +39,9 @@ public class ArrayBST implements TreeStructure {
         resetMetrics();
     }
 
+    /**
+     * Resets the counters used for the experimental measurements.
+     */
     public void resetMetrics() {
         levels = 0;
         operations = 0;
@@ -41,16 +55,20 @@ public class ArrayBST implements TreeStructure {
         return operations;
     }
 
+    /**
+     * Initializes the free-list:
+     * avail = 0 -> 1 -> 2 -> ... -> capacity-1 -> -1
+     */
     private void initializeFreeList() {
         avail = 0;
 
         for (int i = 0; i < capacity; i++) {
-            table[i][INFO] = NULL;
-            table[i][LEFT] = NULL;
-            table[i][RIGHT] = i + 1;
+            table[INFO][i] = NULL;
+            table[LEFT][i] = NULL;
+            table[RIGHT][i] = i + 1;
         }
 
-        table[capacity - 1][RIGHT] = NULL;
+        table[RIGHT][capacity - 1] = NULL;
     }
 
     @Override
@@ -58,40 +76,52 @@ public class ArrayBST implements TreeStructure {
         System.out.println("BST Array");
     }
 
+    /**
+     * Takes one free node from the top of the free-list.
+     * Returns -1 if no free node exists.
+     */
     private int getNode() {
         if (avail == NULL) {
             return NULL;
         }
 
         int newNode = avail;
-        avail = table[avail][RIGHT];
+        avail = table[RIGHT][avail];
 
-        table[newNode][INFO] = NULL;
-        table[newNode][LEFT] = NULL;
-        table[newNode][RIGHT] = NULL;
+        table[INFO][newNode] = NULL;
+        table[LEFT][newNode] = NULL;
+        table[RIGHT][newNode] = NULL;
 
         return newNode;
     }
 
-    private void freeNode(int line) {
-        table[line][INFO] = NULL;
-        table[line][LEFT] = NULL;
-        table[line][RIGHT] = avail;
-        avail = line;
+    /**
+     * Returns a node to the top of the free-list.
+     */
+    private void freeNode(int nodeIndex) {
+        table[INFO][nodeIndex] = NULL;
+        table[LEFT][nodeIndex] = NULL;
+        table[RIGHT][nodeIndex] = avail;
+        avail = nodeIndex;
     }
 
+    /**
+     * Inserts a key into the BST.
+     * If the key already exists, it is not inserted again.
+     */
     @Override
     public void insert(int key) {
+        // Empty tree case
         if (root == NULL) {
             int newNode = getNode();
             if (newNode == NULL) {
-                throw new IllegalStateException("Το ArrayBST είναι γεμάτο.");
+                throw new IllegalStateException("The ArrayBST is full.");
             }
 
             operations++;
             levels = 1;
 
-            table[newNode][INFO] = key;
+            table[INFO][newNode] = key;
             root = newNode;
             size++;
             return;
@@ -100,41 +130,46 @@ public class ArrayBST implements TreeStructure {
         int current = root;
         int parent = NULL;
 
+        // Standard BST traversal using array indices
         while (current != NULL) {
             levels++;
             operations++;
             parent = current;
 
             operations++;
-            if (key < table[current][INFO]) {
-                current = table[current][LEFT];
+            if (key < table[INFO][current]) {
+                current = table[LEFT][current];
             } else {
                 operations++;
-                if (key > table[current][INFO]) {
-                    current = table[current][RIGHT];
+                if (key > table[INFO][current]) {
+                    current = table[RIGHT][current];
                 } else {
-                    return; // duplicate
+                    return; // duplicate key
                 }
             }
         }
 
         int newNode = getNode();
         if (newNode == NULL) {
-            throw new IllegalStateException("Το ArrayBST είναι γεμάτο.");
+            throw new IllegalStateException("The ArrayBST is full.");
         }
 
-        table[newNode][INFO] = key;
+        table[INFO][newNode] = key;
 
         operations++;
-        if (key < table[parent][INFO]) {
-            table[parent][LEFT] = newNode;
+        if (key < table[INFO][parent]) {
+            table[LEFT][parent] = newNode;
         } else {
-            table[parent][RIGHT] = newNode;
+            table[RIGHT][parent] = newNode;
         }
 
         size++;
     }
 
+    /**
+     * Searches for a key in the BST.
+     * Returns the key if found, otherwise returns -1.
+     */
     @Override
     public int search(int key) {
         int current = root;
@@ -143,21 +178,25 @@ public class ArrayBST implements TreeStructure {
             levels++;
             operations++;
 
-            if (key == table[current][INFO]) {
-                return table[current][INFO];
+            if (key == table[INFO][current]) {
+                return table[INFO][current];
             }
 
             operations++;
-            if (key < table[current][INFO]) {
-                current = table[current][LEFT];
+            if (key < table[INFO][current]) {
+                current = table[LEFT][current];
             } else {
-                current = table[current][RIGHT];
+                current = table[RIGHT][current];
             }
         }
 
         return -1;
     }
 
+    /**
+     * Deletes a key from the BST.
+     * Returns true if deletion was successful, false otherwise.
+     */
     @Override
     public boolean delete(int key) {
         if (root == NULL) {
@@ -167,17 +206,18 @@ public class ArrayBST implements TreeStructure {
         int current = root;
         int parent = NULL;
 
-        while (current != NULL && table[current][INFO] != key) {
+        // Search for the node to delete
+        while (current != NULL && table[INFO][current] != key) {
             levels++;
             operations++;
 
             parent = current;
 
             operations++;
-            if (key < table[current][INFO]) {
-                current = table[current][LEFT];
+            if (key < table[INFO][current]) {
+                current = table[LEFT][current];
             } else {
-                current = table[current][RIGHT];
+                current = table[RIGHT][current];
             }
         }
 
@@ -187,10 +227,10 @@ public class ArrayBST implements TreeStructure {
 
         levels++;
 
-        int leftChild = table[current][LEFT];
-        int rightChild = table[current][RIGHT];
+        int leftChild = table[LEFT][current];
+        int rightChild = table[RIGHT][current];
 
-        // 0 ή 1 παιδί
+        // Case 1: node has 0 or 1 child
         if (leftChild == NULL || rightChild == NULL) {
             operations++;
 
@@ -198,10 +238,10 @@ public class ArrayBST implements TreeStructure {
 
             if (parent == NULL) {
                 root = child;
-            } else if (table[parent][LEFT] == current) {
-                table[parent][LEFT] = child;
+            } else if (table[LEFT][parent] == current) {
+                table[LEFT][parent] = child;
             } else {
-                table[parent][RIGHT] = child;
+                table[RIGHT][parent] = child;
             }
 
             freeNode(current);
@@ -209,26 +249,29 @@ public class ArrayBST implements TreeStructure {
             return true;
         }
 
-        // 2 παιδιά
+        // Case 2: node has 2 children
         int successorParent = current;
-        int successor = table[current][RIGHT];
+        int successor = table[RIGHT][current];
 
-        while (table[successor][LEFT] != NULL) {
+        // Find inorder successor
+        while (table[LEFT][successor] != NULL) {
             levels++;
             operations++;
             successorParent = successor;
-            successor = table[successor][LEFT];
+            successor = table[LEFT][successor];
         }
 
-        table[current][INFO] = table[successor][INFO];
+        // Copy successor key into current node
+        table[INFO][current] = table[INFO][successor];
         operations++;
 
-        int successorChild = table[successor][RIGHT];
+        // Remove successor from its old location
+        int successorChild = table[RIGHT][successor];
 
-        if (table[successorParent][LEFT] == successor) {
-            table[successorParent][LEFT] = successorChild;
+        if (table[LEFT][successorParent] == successor) {
+            table[LEFT][successorParent] = successorChild;
         } else {
-            table[successorParent][RIGHT] = successorChild;
+            table[RIGHT][successorParent] = successorChild;
         }
 
         freeNode(successor);
@@ -236,6 +279,9 @@ public class ArrayBST implements TreeStructure {
         return true;
     }
 
+    /**
+     * Returns all keys in the interval [low, high].
+     */
     @Override
     public List<Integer> rangeSearch(int low, int high) {
         List<Integer> result = new ArrayList<>();
@@ -243,6 +289,9 @@ public class ArrayBST implements TreeStructure {
         return result;
     }
 
+    /**
+     * Recursive helper for range search.
+     */
     private void rangeSearchRec(int node, int low, int high, List<Integer> result) {
         if (node == NULL) {
             return;
@@ -251,21 +300,24 @@ public class ArrayBST implements TreeStructure {
         levels++;
         operations++;
 
-        if (low < table[node][INFO]) {
-            rangeSearchRec(table[node][LEFT], low, high, result);
+        if (low < table[INFO][node]) {
+            rangeSearchRec(table[LEFT][node], low, high, result);
         }
 
         operations++;
-        if (low <= table[node][INFO] && table[node][INFO] <= high) {
-            result.add(table[node][INFO]);
+        if (low <= table[INFO][node] && table[INFO][node] <= high) {
+            result.add(table[INFO][node]);
         }
 
         operations++;
-        if (table[node][INFO] < high) {
-            rangeSearchRec(table[node][RIGHT], low, high, result);
+        if (table[INFO][node] < high) {
+            rangeSearchRec(table[RIGHT][node], low, high, result);
         }
     }
 
+    /**
+     * Prints the keys of the BST in sorted order.
+     */
     @Override
     public void inorder() {
         inorderRec(root);
@@ -277,17 +329,23 @@ public class ArrayBST implements TreeStructure {
             return;
         }
 
-        inorderRec(table[node][LEFT]);
-        System.out.print(table[node][INFO] + " ");
-        inorderRec(table[node][RIGHT]);
+        inorderRec(table[LEFT][node]);
+        System.out.print(table[INFO][node] + " ");
+        inorderRec(table[RIGHT][node]);
     }
 
+    /**
+     * Prints the internal 3 x K table for debugging.
+     */
     public void printTable() {
         System.out.println("root = " + root + ", avail = " + avail);
-        System.out.println("Line\tInfo\tLeft\tRight");
+        System.out.println("Index\tInfo\tLeft\tRight");
 
         for (int i = 0; i < capacity; i++) {
-            System.out.println(i + "\t" + table[i][INFO] + "\t" + table[i][LEFT] + "\t" + table[i][RIGHT]);
+            System.out.println(i + "\t" +
+                    table[INFO][i] + "\t" +
+                    table[LEFT][i] + "\t" +
+                    table[RIGHT][i]);
         }
     }
 

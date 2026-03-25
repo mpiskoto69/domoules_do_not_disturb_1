@@ -1,103 +1,94 @@
+
+
 import java.util.Random;
 
 public class ExperimentRunner {
 
-    static Random random = new Random();
+    private static final Random random = new Random();
 
-    private static final int[] NS = { 30, 50, 100, 200, 500, 800, 1000, 5000, 10000, 100000 };
+    // Input sizes required by the assignment
+    private static final int[] NS = {30, 50, 100, 200, 500, 800, 1000, 5000, 10000, 100000};
 
     public static void main(String[] args) {
 
+        // First, print inorder traversals for N = 30 before any measurements
         printInorderForN30();
 
+        // Run the full experiment once for each N and store all results
+        ExperimentResults[] allResults = new ExperimentResults[NS.length];
+
+        for (int i = 0; i < NS.length; i++) {
+            allResults[i] = runExperimentForN(NS[i]);
+        }
+
+        // Print table for operation A
         System.out.println("\n==============================================================");
         System.out.println("Operation A - Insert");
         System.out.println("==============================================================");
         printHeader();
-        for (int N : NS) {
-            printInsertRow(N);
+        for (int i = 0; i < NS.length; i++) {
+            printRow(NS[i], allResults[i].insertMetrics);
         }
 
+        // Print table for operation B
         System.out.println("\n==============================================================");
         System.out.println("Operation B - Delete");
         System.out.println("==============================================================");
         printHeader();
-        for (int N : NS) {
-            printDeleteRow(N);
+        for (int i = 0; i < NS.length; i++) {
+            printRow(NS[i], allResults[i].deleteMetrics);
         }
 
+        // Print table for operation C
         System.out.println("\n==============================================================");
         System.out.println("Operation C - Search");
         System.out.println("==============================================================");
         printHeader();
-        for (int N : NS) {
-            printSearchRow(N);
+        for (int i = 0; i < NS.length; i++) {
+            printRow(NS[i], allResults[i].searchMetrics);
         }
 
+        // Print table for operation D
         System.out.println("\n==============================================================");
         System.out.println("Operation D - Range Search");
         System.out.println("==============================================================");
         printHeader();
-        for (int N : NS) {
-            printRangeRow(N);
+        for (int i = 0; i < NS.length; i++) {
+            printRow(NS[i], allResults[i].rangeMetrics);
         }
     }
 
-   private static void printInorderForN30() {
-    int N = 30;
-
-    DynamicMemoryBST tree1 = new DynamicMemoryBST();
-    ArrayBST tree2 = new ArrayBST(200000);
-    SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(200000);
-
-    int[] initialKeys = random.ints(1, 2 * N + 1)
-            .distinct()
-            .limit(N)
-            .toArray();
-
-    for (int key : initialKeys) {
-        tree1.insert(key);
-        tree2.insert(key);
-        tree3.insert(key);
-    }
-
-    System.out.println("N = 30");
-
-    tree1.printName();
-    System.out.print("Inorder traversal: ");
-    tree1.inorder();
-
-    tree2.printName();
-    System.out.print("Inorder traversal: ");
-    tree2.inorder();
-}
-
-    private static void printHeader() {
-        System.out.println(
-                "N | DynOps | DynTime | DynLevels | ArrOps | ArrTime | ArrLevels | BinOps | BinTime | BinLevels");
-        System.out.println(
-                "----------------------------------------------------------------------------------------------------");
-    }
-
+    /**
+     * Returns K according to the assignment specification.
+     */
     private static int getK(int N) {
-        if (N < 201) {
+        if (N <= 200) {
             return 20;
         }
-        if (N < 1001) {
+        if (N <= 1000) {
             return 50;
         }
         return 100;
     }
 
-    private static String avg(long total, int K) {
-        double value = (double) total / K;
-        return String.format(java.util.Locale.US, "%.2f", value); // format with 2 decimal places
+    /**
+     * Returns a parameterized capacity for the array-based structures.
+     */
+    private static int getCapacity(int N) {
+        int K = getK(N);
+        return N + K + 10;
     }
 
+    /**
+     * Builds fresh structures for a given N and fills them with N distinct random keys
+     * from the range [1, 2N].
+     */
     private static ExperimentStructures buildStructures(int N) {
+        int capacity = getCapacity(N);
+
         DynamicMemoryBST tree1 = new DynamicMemoryBST();
-        ArrayBST tree2 = new ArrayBST(200000);
-        SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(200000);
+        ArrayBST tree2 = new ArrayBST(capacity);
+        SortedArrayBinarySearch tree3 = new SortedArrayBinarySearch(capacity);
 
         int[] initialKeys = random.ints(1, 2 * N + 1)
                 .distinct()
@@ -113,10 +104,61 @@ public class ExperimentRunner {
         return new ExperimentStructures(tree1, tree2, tree3);
     }
 
-    private static void printInsertRow(int N) {
+    /**
+     * Prints inorder traversals for N = 30 for the two BST implementations.
+     */
+    private static void printInorderForN30() {
+        int N = 30;
+        ExperimentStructures s = buildStructures(N);
+
+        System.out.println("N = 30");
+
+        s.tree1.printName();
+        System.out.print("Inorder traversal: ");
+        s.tree1.inorder();
+
+        s.tree2.printName();
+        System.out.print("Inorder traversal: ");
+        s.tree2.inorder();
+    }
+
+    /**
+     * Prints the table header.
+     */
+    private static void printHeader() {
+        System.out.println(
+                "N | DynOps | DynTime(ns) | DynLevels | ArrOps | ArrTime(ns) | ArrLevels | BinOps | BinTime(ns) | BinLevels");
+        System.out.println(
+                "----------------------------------------------------------------------------------------------------------------");
+    }
+
+    /**
+     * Returns the average formatted with 2 decimal digits.
+     */
+    private static String avg(long total, int K) {
+        double value = (double) total / K;
+        return String.format(java.util.Locale.US, "%.2f", value);
+    }
+
+    /**
+     * Runs the full experiment for one value of N on the same structures.
+     */
+    private static ExperimentResults runExperimentForN(int N) {
         int K = getK(N);
         ExperimentStructures s = buildStructures(N);
 
+        Metrics insertMetrics = measureInsert(s, N, K);
+        Metrics deleteMetrics = measureDelete(s, N, K);
+        Metrics searchMetrics = measureSearch(s, N, K);
+        Metrics rangeMetrics = measureRange(s, N, K);
+
+        return new ExperimentResults(insertMetrics, deleteMetrics, searchMetrics, rangeMetrics);
+    }
+
+    /**
+     * Measures operation A: insertion of K random keys from [1, 2N].
+     */
+    private static Metrics measureInsert(ExperimentStructures s, int N, int K) {
         long time1 = 0, time2 = 0, time3 = 0;
         long ops1 = 0, ops2 = 0, ops3 = 0;
         long lev1 = 0, lev2 = 0, lev3 = 0;
@@ -146,13 +188,13 @@ public class ExperimentRunner {
             lev3 += s.tree3.getLevels();
         }
 
-        printRow(N, time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
+        return new Metrics(time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
     }
 
-    private static void printDeleteRow(int N) {
-        int K = getK(N);
-        ExperimentStructures s = buildStructures(N);
-
+    /**
+     * Measures operation B: deletion of K random keys from [1, 2N].
+     */
+    private static Metrics measureDelete(ExperimentStructures s, int N, int K) {
         long time1 = 0, time2 = 0, time3 = 0;
         long ops1 = 0, ops2 = 0, ops3 = 0;
         long lev1 = 0, lev2 = 0, lev3 = 0;
@@ -182,13 +224,13 @@ public class ExperimentRunner {
             lev3 += s.tree3.getLevels();
         }
 
-        printRow(N, time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
+        return new Metrics(time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
     }
 
-    private static void printSearchRow(int N) {
-        int K = getK(N);
-        ExperimentStructures s = buildStructures(N);
-
+    /**
+     * Measures operation C: search of K random keys from [1, 2N].
+     */
+    private static Metrics measureSearch(ExperimentStructures s, int N, int K) {
         long time1 = 0, time2 = 0, time3 = 0;
         long ops1 = 0, ops2 = 0, ops3 = 0;
         long lev1 = 0, lev2 = 0, lev3 = 0;
@@ -218,13 +260,13 @@ public class ExperimentRunner {
             lev3 += s.tree3.getLevels();
         }
 
-        printRow(N, time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
+        return new Metrics(time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
     }
 
-    private static void printRangeRow(int N) {
-        int K = getK(N);
-        ExperimentStructures s = buildStructures(N);
-
+    /**
+     * Measures operation D: range search using K random pairs of keys from [1, 2N].
+     */
+    private static Metrics measureRange(ExperimentStructures s, int N, int K) {
         long time1 = 0, time2 = 0, time3 = 0;
         long ops1 = 0, ops2 = 0, ops3 = 0;
         long lev1 = 0, lev2 = 0, lev3 = 0;
@@ -257,26 +299,23 @@ public class ExperimentRunner {
             lev3 += s.tree3.getLevels();
         }
 
-        printRow(N, time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
+        return new Metrics(time1, ops1, lev1, time2, ops2, lev2, time3, ops3, lev3, K);
     }
 
-    private static void printRow(
-            int N,
-            long time1, long ops1, long lev1,
-            long time2, long ops2, long lev2,
-            long time3, long ops3, long lev3,
-            int K) {
-
+    /**
+     * Prints one table row for one value of N.
+     */
+    private static void printRow(int N, Metrics m) {
         String row = N + " | " +
-                avg(ops1, K) + " | " +
-                avg(time1, K) + " | " +
-                avg(lev1, K) + " | " +
-                avg(ops2, K) + " | " +
-                avg(time2, K) + " | " +
-                avg(lev2, K) + " | " +
-                avg(ops3, K) + " | " +
-                avg(time3, K) + " | " +
-                avg(lev3, K);
+                avg(m.ops1, m.K) + " | " +
+                avg(m.time1, m.K) + " | " +
+                avg(m.lev1, m.K) + " | " +
+                avg(m.ops2, m.K) + " | " +
+                avg(m.time2, m.K) + " | " +
+                avg(m.lev2, m.K) + " | " +
+                avg(m.ops3, m.K) + " | " +
+                avg(m.time3, m.K) + " | " +
+                avg(m.lev3, m.K);
 
         System.out.println(row);
     }

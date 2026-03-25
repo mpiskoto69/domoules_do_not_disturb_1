@@ -20,6 +20,9 @@ public class SortedArrayBinarySearch implements SearchStructure {
         resetMetrics();
     }
 
+    /**
+     * Resets the counters used for the experimental measurements.
+     */
     public void resetMetrics() {
         levels = 0;
         operations = 0;
@@ -38,24 +41,34 @@ public class SortedArrayBinarySearch implements SearchStructure {
         System.out.println("Binary Search");
     }
 
+    /**
+     * Searches for a key using binary search.
+     * Returns the key if found, otherwise returns -1.
+     */
     @Override
     public int search(int key) {
         int index = binarySearchIndex(key);
         return (index == NOT_FOUND) ? NOT_FOUND : array[index];
     }
 
+    /**
+     * Inserts a key into the sorted array.
+     * If the key already exists, it is not inserted again.
+     */
     @Override
     public void insert(int key) {
         if (size == capacity) {
-            throw new IllegalStateException("Ο πίνακας είναι γεμάτος.");
+            throw new IllegalStateException("The sorted array is full.");
         }
 
+        // Do not insert duplicates
         if (binarySearchIndex(key) != NOT_FOUND) {
-            return; // duplicate
+            return;
         }
 
         int position = findInsertPosition(key);
 
+        // Shift elements one position to the right
         for (int i = size; i > position; i--) {
             operations++;
             array[i] = array[i - 1];
@@ -66,6 +79,10 @@ public class SortedArrayBinarySearch implements SearchStructure {
         size++;
     }
 
+    /**
+     * Deletes a key from the sorted array.
+     * Returns true if deletion was successful, false otherwise.
+     */
     @Override
     public boolean delete(int key) {
         int position = binarySearchIndex(key);
@@ -74,6 +91,7 @@ public class SortedArrayBinarySearch implements SearchStructure {
             return false;
         }
 
+        // Shift elements one position to the left
         for (int i = position; i < size - 1; i++) {
             operations++;
             array[i] = array[i + 1];
@@ -83,6 +101,9 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return true;
     }
 
+    /**
+     * Returns all keys in the interval [low, high].
+     */
     @Override
     public List<Integer> rangeSearch(int low, int high) {
         List<Integer> result = new ArrayList<>();
@@ -106,6 +127,10 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return result;
     }
 
+    /**
+     * Standard binary search.
+     * Returns the index of the key if found, otherwise returns -1.
+     */
     private int binarySearchIndex(int key) {
         int left = 0;
         int right = size - 1;
@@ -131,6 +156,9 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return NOT_FOUND;
     }
 
+    /**
+     * Finds the correct insertion position for a new key.
+     */
     private int findInsertPosition(int key) {
         int left = 0;
         int right = size - 1;
@@ -153,6 +181,10 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return answer;
     }
 
+    /**
+     * Finds the index of the first element >= value.
+     * If no such element exists, returns size.
+     */
     private int findFirstGreaterOrEqual(int value) {
         int left = 0;
         int right = size - 1;
@@ -175,6 +207,9 @@ public class SortedArrayBinarySearch implements SearchStructure {
         return answer;
     }
 
+    /**
+     * Prints the contents of the sorted array.
+     */
     public void printArray() {
         for (int i = 0; i < size; i++) {
             System.out.print(array[i] + " ");

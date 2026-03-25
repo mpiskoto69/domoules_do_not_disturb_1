@@ -1,8 +1,8 @@
 
 import java.util.List;
 
-/*
- * Κοινό interface για τις 3 δομές της εργασίας.
+/**
+ * Common interface for the sorted-array structure.
  */
 public interface SearchStructure {
 
