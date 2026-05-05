@@ -1,0 +1,143 @@
+/*
+
+AMD Vivado v2025.2 (64-bit) [Major: 2025, Minor: 2]
+SW Build: 6299465 on Fri Nov 14 12:34:56 MST 2025
+IP Build: 6300035 on Fri Nov 14 10:48:45 MST 2025
+IP Build: 6300035 on Fri Nov 14 10:48:45 MST 2025
+
+Process ID (PID): 12804
+License: Customer
+Mode: GUI Mode
+
+Current time: 	Tue Mar 31 11:00:11 EEST 2026
+Time zone: 	Eastern European Standard Time (Europe/Athens)
+
+OS: Fedora release 42 (Adams)
+OS Version: 6.17.13-200.fc42.x86_64
+OS Architecture: amd64
+Available processors (cores): 12
+LSB Release Description: Fedora release 42 (Adams)
+
+Display: 0
+Screen size: 2560x1600
+Local screen bounds: x = 0, y = 0, width = 2560, height = 1523
+Screen resolution (DPI): 100
+Available screens: 1
+Default font: family=Dialog,name=Dialog,style=plain,size=21
+Scale size: 37
+OS font scaling: 100%
+Anti-Alias Enabled: false
+
+Java version: 	21.0.5 64-bit
+
+Java home: 	/home/st25playsx2/2025.2/tps/lnx64/jre21.0.5_11
+Java executable: 	/home/st25playsx2/2025.2/tps/lnx64/jre21.0.5_11/bin/java
+Java arguments: 	[-Dsun.java2d.pmoffscreen=false, -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2, -Dsun.java2d.xrender=false, -Dsun.java2d.uiScale.enabled=false, -Dswing.aatext=true, -XX:-UsePerfData, -Djdk.map.althashing.threshold=512, -XX:StringTableSize=4072, -XX:+UseStringDeduplication, -XX:MaxGCPauseMillis=200, -XX:ParallelGCThreads=4, -XX:+ParallelRefProcEnabled, --add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED, --add-opens=java.base/java.nio=ALL-UNNAMED, --add-opens=java.desktop/sun.swing=ALL-UNNAMED, --add-opens=java.desktop/javax.swing=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED, --add-opens=java.desktop/javax.swing=ALL-UNNAMED, --add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED, --add-opens=java.desktop/java.awt.event=ALL-UNNAMED, --add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED, --add-exports=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED, --add-exports=java.base/java.nio=ALL-UNNAMED, --add-exports=java.desktop/sun.swing=ALL-UNNAMED, --add-exports=java.desktop/javax.swing=ALL-UNNAMED, --add-exports=java.desktop/javax.swing.tree=ALL-UNNAMED, --add-exports=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED, --add-exports=java.desktop/sun.swing=ALL-UNNAMED, --add-exports=java.desktop/sun.swing.table=ALL-UNNAMED, --add-exports=java.desktop/sun.swing.plaf.synth=ALL-UNNAMED, --add-exports=java.desktop/sun.awt.shell=ALL-UNNAMED, --add-exports=java.base/sun.security.action=ALL-UNNAMED, --add-exports=java.desktop/sun.font=ALL-UNNAMED, --add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED, -XX:NewSize=80m, -XX:MaxNewSize=80m, -Xms812m, -Xmx6144m, -Xss10m, -Xrs]
+Java initial memory (-Xms): 	812 MB
+Java maximum memory (-Xmx):	 6 GB
+
+User name: 	st25playsx2
+User home directory: /home/st25playsx2
+User working directory: /home/st25playsx2/Documents/domes2026/domoules_do_not_disturb_1
+User country: 	US
+User language: 	en
+User locale: 	en_US
+
+RDI_BASEROOT: /home/st25playsx2/2025.2
+HDI_APPROOT: /home/st25playsx2/2025.2/Vivado
+RDI_DATADIR: /home/st25playsx2/Documents/domes2026/domoules_do_not_disturb_1/:/home/st25playsx2/2025.2/data
+RDI_BINDIR: /home/st25playsx2/2025.2/Vivado/bin
+
+Vivado preferences file: /home/st25playsx2/.Xilinx/Vivado/2025.2/vivado.xml
+Vivado preferences directory: /home/st25playsx2/.Xilinx/Vivado/2025.2/
+Vivado layouts directory: /home/st25playsx2/.Xilinx/Vivado/2025.2/data/layouts
+PlanAhead jar file: 	/home/st25playsx2/2025.2/Vivado/lib/classes/planAhead.jar
+Vivado log file: 	/home/st25playsx2/Documents/domes2026/domoules_do_not_disturb_1/vivado.log
+Vivado journal file: 	/home/st25playsx2/Documents/domes2026/domoules_do_not_disturb_1/vivado.jou
+Engine tmp dir: 	./.Xil/Vivado-12804-station464.wireless.tuc.gr
+Non-Default Parameters:	[]
+
+Xilinx & AMD Environment Variables
+--------------------------------------------------------------------------------------------
+RDI_APPROOT: /home/st25playsx2/2025.2/Vivado
+RDI_BASEROOT: /home/st25playsx2/2025.2
+RDI_BINROOT: /home/st25playsx2/2025.2/Vivado/bin
+RDI_BUILD: yes
+RDI_DATADIR: :/home/st25playsx2/2025.2/data
+RDI_INSTALLROOT: /home/st25playsx2
+RDI_INSTALLVER: Vivado
+RDI_JAVA_PLATFORM: 
+RDI_JAVA_VERSION: 21.0.5_11
+RDI_LIBDIR: /home/st25playsx2/2025.2/Vivado/lib/lnx64.o/Default:/home/st25playsx2/2025.2/Vivado/lib/lnx64.o
+RDI_OPT_EXT: .o
+RDI_PATCHROOT: 
+RDI_PLATFORM: lnx64
+RDI_PREPEND_PATH: /home/st25playsx2/2025.2/Vitis/bin:/home/st25playsx2/2025.2/Vivado/ids_lite/ISE/bin/lin64
+RDI_PROG: /home/st25playsx2/2025.2/Vivado/bin/unwrapped/lnx64.o/vivado
+RDI_SESSION_INFO: /home/st25playsx2/Documents/domes2026/domoules_do_not_disturb_1:station464.wireless.tuc.gr_1774943986_12745
+RDI_SHARED_DATA: 
+RDI_TPS_ROOT: /home/st25playsx2/2025.2/Vivado/tps/lnx64
+RDI_USE_JDK21: True
+SHELL: /bin/bash
+VSCODE_JAVA_EXEC: /usr/lib/jvm/java-21-openjdk/bin/java
+XILINX: /home/st25playsx2/2025.2/Vivado/ids_lite/ISE
+XILINX_DSP: /home/st25playsx2/2025.2/Vivado/ids_lite/ISE
+XILINX_HLS: /home/st25playsx2/2025.2/Vitis
+XILINX_PLANAHEAD: /home/st25playsx2/2025.2/Vivado
+XILINX_SDK: /home/st25playsx2/2025.2/Vitis
+XILINX_VITIS: /home/st25playsx2/2025.2/Vitis
+XILINX_VIVADO: /home/st25playsx2/2025.2/Vivado
+_JAVA_AWT_WM_NONREPARENTING: 1
+
+
+GUI allocated memory:	812 MB
+GUI max memory:		6,144 MB
+Engine allocated memory: 1,878 MB
+
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+*/
+
+// TclEventType: START_GUI
+// Tcl Message: start_gui 
+selectList(PAResourceQtoS.SyntheticaGettingStartedView_RECENT_PROJECTS, "/home/st25playsx2/Documents/organosi/lab2/project_2/project_2.xpr", 0); // b.c (PAResourceQtoS.SyntheticaGettingStartedView_RECENT_PROJECTS)
+// Opening Vivado Project: /home/st25playsx2/Documents/organosi/lab2/project_2/project_2.xpr. Version: Vivado v2025.2 
+// TclEventType: DEBUG_PROBE_SET_CHANGE
+// TclEventType: FLOW_ADDED
+// TclEventType: MSGMGR_MOVEMSG
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: FILE_SET_NEW
+// TclEventType: RUN_COMPLETED
+// TclEventType: RUN_STATUS_CHANGE
+// TclEventType: RUN_COMPLETED
+// TclEventType: RUN_STATUS_CHANGE
+// TclEventType: RUN_CURRENT
+// TclEventType: MSGMGR_REFRESH_MSG
+// TclEventType: PROJECT_DASHBOARD_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_NEW
+// [GUI Memory]: 148 MB (+152993kb) [00:00:16]
+// [Engine Memory]: 1,971 MB (+1915705kb) [00:00:16]
+// WARNING: HEventQueue.dispatchEvent() is taking  4098 ms.
+// Tcl Message: open_project /home/st25playsx2/Documents/organosi/lab2/project_2/project_2.xpr 
+// Tcl Message: Scanning sources... Finished scanning sources 
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories INFO: [IP_Flow 19-1704] No user IP repositories specified INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/st25playsx2/2025.2/data/ip'. 
+// HMemoryUtils.trashcanNow. Engine heap size: 2,039 MB. GUI used memory: 84 MB. Current time: 3/31/26, 11:00:16 AM EEST
+// [GUI Memory]: 159 MB (+3560kb) [00:00:19]
+// Project name: project_2; location: /home/st25playsx2/Documents/organosi/lab2/project_2; part: xc7s15cpga196-2
+// Tcl Message: open_project: Time (s): cpu = 00:00:21 ; elapsed = 00:00:06 . Memory (MB): peak = 10262.328 ; gain = 211.875 ; free physical = 836 ; free virtual = 16038 
+dismissDialog("Open Project"); // bk (Open Project Progress)
+// TclEventType: DG_GRAPH_GENERATED
+// Tcl Message: update_compile_order -fileset sources_1 
