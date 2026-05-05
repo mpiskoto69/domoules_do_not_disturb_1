@@ -17,11 +17,39 @@ import java.util.Random;
 public class ExperimentMain {
 
     private static final int[] N_VALUES = {20, 50, 100, 200, 1000, 2500, 5000, 10000, 20000, 40000, 60000, 80000, 100000, 200000, 1000000, 3000000};
-    private static final String DATA_DIR = "src/org/tuc/randomnumbers/";
+    private static String dataDir;
+
+    static {
+        // Try to find the data directory in common locations
+        String[] potentialPaths = {
+            System.getProperty("data.dir"),
+            "src/org/tuc/randomnumbers/",
+            "domoules_2/src/org/tuc/randomnumbers/",
+            "../src/org/tuc/randomnumbers/",
+            "domoules_do_not_disturb_1/domoules_2/src/org/tuc/randomnumbers/"
+        };
+
+        for (String path : potentialPaths) {
+            if (path != null && Files.isDirectory(Paths.get(path))) {
+                dataDir = path.endsWith("/") ? path : path + "/";
+                break;
+            }
+        }
+
+        if (dataDir == null) {
+            dataDir = "src/org/tuc/randomnumbers/"; // Fallback to original
+        }
+    }
 
     public static void main(String[] args) {
         System.out.println("Starting Experiment...");
+        System.out.println("Using data directory: " + Paths.get(dataDir).toAbsolutePath());
         
+        if (!Files.isDirectory(Paths.get(dataDir))) {
+            System.err.println("CRITICAL: Data directory not found! Please ensure you are running from the project root or specify -Ddata.dir=/path/to/randomnumbers/");
+            return;
+        }
+
         // Arrays to store results for the tables
         double[][] insertTimes = new double[N_VALUES.length][6];
         double[][] searchTimes = new double[N_VALUES.length][6];
@@ -35,7 +63,7 @@ public class ExperimentMain {
 
             int[] initialKeys;
             try {
-                initialKeys = readInts(DATA_DIR + "numbers-" + N + ".bin");
+                initialKeys = readInts(dataDir + "numbers-" + N + ".bin");
             } catch (IOException e) {
                 System.err.println("Error reading file for N=" + N + ": " + e.getMessage());
                 continue;
