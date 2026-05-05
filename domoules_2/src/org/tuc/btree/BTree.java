@@ -1,8 +1,10 @@
 package org.tuc.btree;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
-public class BTree {
+public class BTree implements org.tuc.interfaces.SearchInsert {
 
 	private int T;
 
@@ -336,5 +338,36 @@ public class BTree {
 				Show(x.child[i]);
 			}
 		}
+	}
+
+	@Override
+	public boolean searchKey(int key) {
+		return Contain(key);
+	}
+
+	@Override
+	public List<Integer> rangeQuery(int low, int high) {
+		List<Integer> result = new ArrayList<>();
+		rangeQueryHelper(root, low, high, result);
+		return result;
+	}
+
+	private void rangeQueryHelper(Node x, int low, int high, List<Integer> result) {
+		if (x == null)
+			return;
+
+		int i;
+
+		for (i = 0; i < x.n; i++) {
+
+			if (!x.leaf)
+				rangeQueryHelper(x.child[i], low, high, result);
+
+			if (x.key[i] >= low && x.key[i] <= high)
+				result.add(x.key[i]);
+		}
+
+		if (!x.leaf)
+			rangeQueryHelper(x.child[i], low, high, result);
 	}
 }

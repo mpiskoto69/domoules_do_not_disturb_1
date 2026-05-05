@@ -1,42 +1,38 @@
 package org.tuc.avl;
 
-public class AVLTree
-{
+import java.util.ArrayList;
+import java.util.List;
+import org.tuc.interfaces.SearchInsert;
 
+public class AVLTree implements SearchInsert {
 
     // returns the height of the node
-    private int Height(Node key)
-    {
+    private int Height(Node key) {
         if (key == null)
-           return 0;
+            return 0;
 
         else
             return key.height;
     }
 
-
     // Balance computes the balance factor of the node
-    private int Balance(Node key)
-    {
+    private int Balance(Node key) {
         if (key == null)
-           return 0;
+            return 0;
 
         else
-            return ( Height(key.right) - Height(key.left) );
+            return (Height(key.right) - Height(key.left));
     }
 
-
     // updateHeight updates the height of the node
-    private void updateHeight(Node key)
-    {
+    private void updateHeight(Node key) {
         int l = Height(key.left);
         int r = Height(key.right);
 
-        key.height = Math.max(l , r) + 1;
+        key.height = Math.max(l, r) + 1;
     }
 
-    Node rotateLeft(Node x)
-    {
+    Node rotateLeft(Node x) {
         Node y = x.right;
         Node T2 = y.left;
 
@@ -49,8 +45,7 @@ public class AVLTree
         return y;
     }
 
-    private Node rotateRight(Node y)
-    {
+    private Node rotateRight(Node y) {
         Node x = y.left;
         Node T2 = x.right;
 
@@ -64,32 +59,30 @@ public class AVLTree
     }
 
     // balanceTree balances the tree using rotations after an insertion or deletion
-    private Node balanceTree(Node root)
-    {
+    private Node balanceTree(Node root) {
         updateHeight(root);
 
         int balance = Balance(root);
 
-        if (balance > 1) //R
+        if (balance > 1) // R
         {
-            if (Balance(root.right) < 0)//RL
+            if (Balance(root.right) < 0)// RL
             {
                 root.right = rotateRight(root.right);
                 return rotateLeft(root);
             }
 
-            else //RR
+            else // RR
                 return rotateLeft(root);
         }
 
-        if (balance < -1)//L
+        if (balance < -1)// L
         {
-            if (Balance(root.left) > 0)//LR
+            if (Balance(root.left) > 0)// LR
             {
                 root.left = rotateLeft(root.left);
                 return rotateRight(root);
-            }
-            else//LL
+            } else// LL
                 return rotateRight(root);
         }
 
@@ -98,9 +91,7 @@ public class AVLTree
 
     Node Root;
 
-
-    private Node insertNode(Node root, int key)
-    {
+    private Node insertNode(Node root, int key) {
         // Performs normal BST insertion
         if (root == null)
             return new Node(key);
@@ -116,8 +107,7 @@ public class AVLTree
     }
 
     // Successor returns the next largest node
-    private Node Successor(Node root)
-    {
+    private Node Successor(Node root) {
         if (root.left != null)
             return Successor(root.left);
 
@@ -125,9 +115,7 @@ public class AVLTree
             return root;
     }
 
-
-    private Node deleteNode(Node root, int key)
-    {
+    private Node deleteNode(Node root, int key) {
         // Performs standard BST Deletion
         if (root == null)
             return root;
@@ -138,16 +126,14 @@ public class AVLTree
         else if (key > root.value)
             root.right = deleteNode(root.right, key);
 
-        else
-        {
+        else {
             if (root.right == null)
                 root = root.left;
 
             else if (root.left == null)
                 root = root.right;
 
-            else
-            {
+            else {
                 Node temp = Successor(root.right);
                 root.value = temp.value;
                 root.right = deleteNode(root.right, root.value);
@@ -163,9 +149,8 @@ public class AVLTree
     }
 
     // findNode is used to search for a particular value given the root
-    private Node findNode(Node root, int key)
-    {
-        if (root == null || key==root.value)
+    private Node findNode(Node root, int key) {
+        if (root == null || key == root.value)
             return root;
 
         if (key < root.value)
@@ -176,33 +161,29 @@ public class AVLTree
     }
 
     // Utility function for insertion of node
-    public void insert(int key)
-    {
-        if (findNode(Root , key) == null)
-        {
-            Root = insertNode(Root , key);
-            //System.out.println("Insertion successful");
+    public void insert(int key) {
+        if (findNode(Root, key) == null) {
+            Root = insertNode(Root, key);
+            // System.out.println("Insertion successful");
         }
 
         else {
-         //   System.out.println("\nKey with the entered value already exists in the tree");
+            // System.out.println("\nKey with the entered value already exists in the
+            // tree");
         }
     }
-    
-    public int search(int key)
-    {
-        if(findNode(Root, key) == null)
+
+    public int search(int key) {
+        if (findNode(Root, key) == null)
             return 0;
         else
             return 1;
     }
 
     // Utility function for deletion of node
-    public void delete(int key)
-    {
-        if (findNode(Root , key) != null)
-        {
-            Root = deleteNode(Root , key);
+    public void delete(int key) {
+        if (findNode(Root, key) != null) {
+            Root = deleteNode(Root, key);
             System.out.println("\nDeletion successful ");
         }
 
@@ -210,56 +191,75 @@ public class AVLTree
             System.out.println("\nNo node with entered value found in tree");
     }
 
-    public void InOrder(Node root)
-    {
-        if(root == null)
-        {
+    public void InOrder(Node root) {
+        if (root == null) {
             System.out.println("\nNo nodes in the tree");
             return;
         }
 
-        if(root.left != null)
+        if (root.left != null)
             InOrder(root.left);
         System.out.print(root.value + " ");
-        if(root.right != null)
+        if (root.right != null)
             InOrder(root.right);
 
     }
 
-    public void PreOrder(Node root)
-    {
-        if(root == null)
-        {
+    public void PreOrder(Node root) {
+        if (root == null) {
             System.out.println("No nodes in the tree");
             return;
         }
 
         System.out.print(root.value + " ");
-        if(root.left != null)
+        if (root.left != null)
             PreOrder(root.left);
-        if(root.right != null)
+        if (root.right != null)
             PreOrder(root.right);
 
     }
 
-    public void PostOrder(Node key)
-    {
-        if(key == null)
-        {
+    public void PostOrder(Node key) {
+        if (key == null) {
             System.out.println("No nodes in the tree");
             return;
         }
 
-
-        if(key.left != null)
+        if (key.left != null)
             PostOrder(key.left);
-        if(key.right != null)
+        if (key.right != null)
             PostOrder(key.right);
         System.out.print(key.value + " ");
 
     }
 
     public void removeAll() {
-    	Root = null;
+        Root = null;
+    }
+
+    @Override
+    public boolean searchKey(int key) {
+        return search(key) == 1;
+    }
+
+    @Override
+    public List<Integer> rangeQuery(int low, int high) {
+        List<Integer> result = new ArrayList<>();
+        rangeQueryHelper(Root, low, high, result);
+        return result;
+    }
+
+    private void rangeQueryHelper(Node root, int low, int high, List<Integer> result) {
+        if (root == null)
+            return;
+
+        if (root.value > low)
+            rangeQueryHelper(root.left, low, high, result);
+
+        if (root.value >= low && root.value <= high)
+            result.add(root.value);
+
+        if (root.value < high)
+            rangeQueryHelper(root.right, low, high, result);
     }
 }

@@ -1,16 +1,14 @@
 package org.tuc.bst;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class BSTree
-{
+public class BSTree implements org.tuc.interfaces.SearchInsert {
     // NODE structure
-
 
     Node Root;
 
-
-    private Node insertNode(Node root, int key)
-    {
+    private Node insertNode(Node root, int key) {
         // Performs normal BST insertion
         if (root == null)
             return new Node(key);
@@ -26,8 +24,7 @@ public class BSTree
     }
 
     // Successor returns the next largest node
-    private Node Successor(Node root)
-    {
+    private Node Successor(Node root) {
         if (root.left != null)
             return Successor(root.left);
 
@@ -35,9 +32,7 @@ public class BSTree
             return root;
     }
 
-
-    private Node deleteNode(Node root, int key)
-    {
+    private Node deleteNode(Node root, int key) {
         // Performs standard BST Deletion
         if (root == null)
             return root;
@@ -48,16 +43,14 @@ public class BSTree
         else if (key > root.value)
             root.right = deleteNode(root.right, key);
 
-        else
-        {
+        else {
             if (root.right == null)
                 root = root.left;
 
             else if (root.left == null)
                 root = root.right;
 
-            else
-            {
+            else {
                 Node temp = Successor(root.right);
                 root.value = temp.value;
                 root.right = deleteNode(root.right, root.value);
@@ -68,9 +61,8 @@ public class BSTree
     }
 
     // findNode is used to search for a particular value given the root
-    private Node findNode(Node root, int key)
-    {
-        if (root == null || key==root.value)
+    private Node findNode(Node root, int key) {
+        if (root == null || key == root.value)
             return root;
 
         if (key < root.value)
@@ -81,35 +73,29 @@ public class BSTree
     }
 
     // Utility function for insertion of node
-    public void insert(int key)
-    {
-        if (findNode(Root , key) == null)
-        {
-            Root = insertNode(Root , key);
-            //System.out.println("Insertion successful");
+    public void insert(int key) {
+        if (findNode(Root, key) == null) {
+            Root = insertNode(Root, key);
+            // System.out.println("Insertion successful");
         }
 
         else {
-            //System.out.println("\nKey with the entered value already exists in the tree");
+            // System.out.println("\nKey with the entered value already exists in the
+            // tree");
         }
     }
 
-    
-   
-    public int search(int key)
-    {
-        if(findNode(Root, key) == null)
+    public int search(int key) {
+        if (findNode(Root, key) == null)
             return 0;
         else
             return 1;
     }
 
     // Utility function for deletion of node
-    public void delete(int key)
-    {
-        if (findNode(Root , key) != null)
-        {
-            Root = deleteNode(Root , key);
+    public void delete(int key) {
+        if (findNode(Root, key) != null) {
+            Root = deleteNode(Root, key);
             System.out.println("\nDeletion successful ");
         }
 
@@ -117,53 +103,72 @@ public class BSTree
             System.out.println("\nNo node with entered value found in tree");
     }
 
-    public void InOrder(Node root)
-    {
-        if(root == null)
-        {
+    public void InOrder(Node root) {
+        if (root == null) {
             System.out.println("\nNo nodes in the tree");
             return;
         }
 
-        if(root.left != null)
+        if (root.left != null)
             InOrder(root.left);
         System.out.print(root.value + " ");
-        if(root.right != null)
+        if (root.right != null)
             InOrder(root.right);
 
     }
 
-    public void PreOrder(Node root)
-    {
-        if(root == null)
-        {
+    public void PreOrder(Node root) {
+        if (root == null) {
             System.out.println("No nodes in the tree");
             return;
         }
 
         System.out.print(root.value + " ");
-        if(root.left != null)
+        if (root.left != null)
             PreOrder(root.left);
-        if(root.right != null)
+        if (root.right != null)
             PreOrder(root.right);
 
     }
 
-    public void PostOrder(Node key)
-    {
-        if(key == null)
-        {
+    public void PostOrder(Node key) {
+        if (key == null) {
             System.out.println("No nodes in the tree");
             return;
         }
 
-
-        if(key.left != null)
+        if (key.left != null)
             PostOrder(key.left);
-        if(key.right != null)
+        if (key.right != null)
             PostOrder(key.right);
         System.out.print(key.value + " ");
 
+    }
+
+    @Override
+    public boolean searchKey(int key) {
+        return search(key) == 1;
+    }
+
+    @Override
+    public List<Integer> rangeQuery(int low, int high) {
+        List<Integer> result = new ArrayList<>();
+        rangeQueryHelper(Root, low, high, result);
+        return result;
+    }
+
+    private void rangeQueryHelper(Node root, int low, int high, List<Integer> result) {
+        if (root == null)
+            return;
+
+        if (root.value > low)
+            rangeQueryHelper(root.left, low, high, result);
+
+        if (root.value >= low && root.value <= high)
+            result.add(root.value);
+
+        if (root.value < high)
+            rangeQueryHelper(root.right, low, high, result);
     }
 
 }
