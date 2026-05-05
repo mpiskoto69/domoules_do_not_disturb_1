@@ -1,0 +1,13 @@
+src/org/tuc/avl/AVLTmain.java
+src/org/tuc/avl/Node.java
+src/org/tuc/avl/AVLTree.java
+src/org/tuc/bst/BSTmain.java
+src/org/tuc/bst/Node.java
+src/org/tuc/bst/BSTree.java
+src/org/tuc/btree/BtreeMain.java
+src/org/tuc/btree/Node.java
+src/org/tuc/btree/BTree.java
+src/org/tuc/linearhashing/HashBucket.java
+src/org/tuc/linearhashing/LinearMain.java
+src/org/tuc/linearhashing/LinearHashing.java
+src/org/tuc/interfaces/SearchInsert.java

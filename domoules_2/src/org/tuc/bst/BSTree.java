@@ -1,7 +1,10 @@
 package org.tuc.bst;
 
+import java.util.List;
+import java.util.ArrayList;
 
-public class BSTree
+
+public class BSTree implements org.tuc.interfaces.SearchInsert
 {
     // NODE structure
 
@@ -166,4 +169,24 @@ public class BSTree
 
     }
 
+
+    // Adapter to the required interface
+    @Override
+    public boolean searchKey(int key) {
+        return this.search(key) == 1;
+    }
+
+    @Override
+    public java.util.List<Integer> rangeQuery(int low, int high) {
+        java.util.List<Integer> res = new java.util.ArrayList<>();
+        rangeHelper(Root, low, high, res);
+        return res;
+    }
+
+    private void rangeHelper(Node node, int low, int high, java.util.List<Integer> res) {
+        if (node == null) return;
+        if (node.value > low) rangeHelper(node.left, low, high, res);
+        if (node.value >= low && node.value <= high) res.add(node.value);
+        if (node.value < high) rangeHelper(node.right, low, high, res);
+    }
 }

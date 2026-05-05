@@ -1,6 +1,9 @@
 package org.tuc.linearhashing;
 
-public class LinearHashing {
+import java.util.List;
+import java.util.ArrayList;
+
+public class LinearHashing implements org.tuc.interfaces.SearchInsert {
 
 	private HashBucket[] hashBuckets;	// pointer to the hash buckets
 
@@ -151,4 +154,17 @@ public class LinearHashing {
 
 
 
-} // LinearHashing class
+
+    // Adapter to the required interface
+    @Override
+    public boolean searchKey(int key) {
+        return this.search(key);
+    }
+
+    @Override
+    public java.util.List<Integer> rangeQuery(int low, int high) {
+        // Range queries do not make sense for hashing; return empty list
+        return new java.util.ArrayList<Integer>();
+    }
+
+}
