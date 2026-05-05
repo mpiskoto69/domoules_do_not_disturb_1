@@ -17,6 +17,17 @@ public class BTree implements org.tuc.interfaces.SearchInsert {
 
 	private Node root;
 
+	private int lastSearchLevels = 0;
+	private int lastRangeLevels = 0;
+
+	public int getLastSearchLevels() {
+		return lastSearchLevels;
+	}
+
+	public int getLastRangeLevels() {
+		return lastRangeLevels;
+	}
+
 	// Search the key
 	private Node Search(Node x, int key) {
 		int i = 0;
@@ -329,7 +340,8 @@ public class BTree implements org.tuc.interfaces.SearchInsert {
 
 	// Show the node
 	private void Show(Node x) {
-		assert (x == null);
+		if (x == null)
+			return;
 		for (int i = 0; i < x.n; i++) {
 			System.out.print(x.key[i] + " ");
 		}
@@ -342,11 +354,35 @@ public class BTree implements org.tuc.interfaces.SearchInsert {
 
 	@Override
 	public boolean searchKey(int key) {
-		return Contain(key);
+		lastSearchLevels = 0;
+		return searchWithLevels(root, key);
+	}
+
+	private boolean searchWithLevels(Node x, int key) {
+		if (x == null)
+			return false;
+
+		lastSearchLevels++;
+
+		int i;
+
+		for (i = 0; i < x.n; i++) {
+			if (key < x.key[i])
+				break;
+
+			if (key == x.key[i])
+				return true;
+		}
+
+		if (x.leaf)
+			return false;
+
+		return searchWithLevels(x.child[i], key);
 	}
 
 	@Override
 	public List<Integer> rangeQuery(int low, int high) {
+		lastRangeLevels = 0;
 		List<Integer> result = new ArrayList<>();
 		rangeQueryHelper(root, low, high, result);
 		return result;
@@ -356,18 +392,26 @@ public class BTree implements org.tuc.interfaces.SearchInsert {
 		if (x == null)
 			return;
 
-		int i;
+		lastRangeLevels++;
 
-		for (i = 0; i < x.n; i++) {
+		int i = 0;
 
-			if (!x.leaf)
-				rangeQueryHelper(x.child[i], low, high, result);
-
-			if (x.key[i] >= low && x.key[i] <= high)
-				result.add(x.key[i]);
+		while (i < x.n && x.key[i] < low) {
+			i++;
 		}
 
-		if (!x.leaf)
+		if (!x.leaf) {
 			rangeQueryHelper(x.child[i], low, high, result);
+		}
+
+		while (i < x.n && x.key[i] <= high) {
+			result.add(x.key[i]);
+
+			if (!x.leaf) {
+				rangeQueryHelper(x.child[i + 1], low, high, result);
+			}
+
+			i++;
+		}
 	}
 }

@@ -91,6 +91,17 @@ public class AVLTree implements SearchInsert {
 
     Node Root;
 
+    private int lastSearchLevels = 0;
+    private int lastRangeLevels = 0;
+
+    public int getLastSearchLevels() {
+        return lastSearchLevels;
+    }
+
+    public int getLastRangeLevels() {
+        return lastRangeLevels;
+    }
+
     private Node insertNode(Node root, int key) {
         // Performs normal BST insertion
         if (root == null)
@@ -239,11 +250,28 @@ public class AVLTree implements SearchInsert {
 
     @Override
     public boolean searchKey(int key) {
-        return search(key) == 1;
+        lastSearchLevels = 0;
+        return searchKeyWithLevels(Root, key);
+    }
+
+    private boolean searchKeyWithLevels(Node root, int key) {
+        if (root == null)
+            return false;
+
+        lastSearchLevels++;
+
+        if (key == root.value)
+            return true;
+
+        if (key < root.value)
+            return searchKeyWithLevels(root.left, key);
+        else
+            return searchKeyWithLevels(root.right, key);
     }
 
     @Override
     public List<Integer> rangeQuery(int low, int high) {
+        lastRangeLevels = 0;
         List<Integer> result = new ArrayList<>();
         rangeQueryHelper(Root, low, high, result);
         return result;
@@ -252,6 +280,8 @@ public class AVLTree implements SearchInsert {
     private void rangeQueryHelper(Node root, int low, int high, List<Integer> result) {
         if (root == null)
             return;
+
+        lastRangeLevels++;
 
         if (root.value > low)
             rangeQueryHelper(root.left, low, high, result);

@@ -2,7 +2,6 @@ package org.tuc.linearhashing;
 
 import java.io.*;
 
-
 class HashBucket {
 
 	private int keysNumber;
@@ -126,6 +125,22 @@ class HashBucket {
 		} else {
 			return false;
 		}
+	}
+
+	public boolean searchKeyWithLevels(int key, LinearHashing lh) {
+		lh.increaseLastSearchLevels();
+
+		int bucketSize = lh.getBucketSize();
+
+		for (int i = 0; (i < this.keysNumber) && (i < bucketSize); i++) {
+			if (this.keys[i] == key)
+				return true;
+		}
+
+		if (this.overflowBucket != null)
+			return this.overflowBucket.searchKeyWithLevels(key, lh);
+
+		return false;
 	}
 
 	public void splitBucket(LinearHashing lh, int n, int bucketPos, HashBucket newBucket) { // splits the current bucket

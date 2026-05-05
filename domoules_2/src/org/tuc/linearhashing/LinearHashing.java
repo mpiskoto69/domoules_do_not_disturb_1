@@ -17,6 +17,15 @@ public class LinearHashing implements org.tuc.interfaces.SearchInsert {
 	private int n; // current number of buckets
 	private int j; // the n used for the hash function
 	private int minBuckets; // minimum number of buckets this hash table can have
+	private int lastSearchLevels = 0;
+
+	public int getLastSearchLevels() {
+		return lastSearchLevels;
+	}
+
+	public void increaseLastSearchLevels() {
+		lastSearchLevels++;
+	}
 
 	private int hashFunction(int key) { // Returns a hash based on the key
 
@@ -167,7 +176,8 @@ public class LinearHashing implements org.tuc.interfaces.SearchInsert {
 
 	@Override
 	public boolean searchKey(int key) {
-		return search(key);
+		lastSearchLevels = 0;
+		return this.hashBuckets[this.hashFunction(key)].searchKeyWithLevels(key, this);
 	}
 
 	@Override
