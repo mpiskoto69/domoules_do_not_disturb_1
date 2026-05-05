@@ -1,8 +1,7 @@
 package org.tuc.btree;
 
-import java.util.List;
 import java.util.ArrayList;
-
+import java.util.List;
 import java.util.Stack;
 
 public class BTree implements org.tuc.interfaces.SearchInsert {
@@ -18,11 +17,23 @@ public class BTree implements org.tuc.interfaces.SearchInsert {
 
 	private Node root;
 
+	private long lastAccessedLevels;
+
+	public long getLastAccessedLevels() {
+		return lastAccessedLevels;
+	}
+
+	private void resetLevels() {
+		lastAccessedLevels = 0;
+	}
+
 	// Search the key
 	private Node Search(Node x, int key) {
-		int i = 0;
 		if (x == null)
-			return x;
+			return null;
+
+		lastAccessedLevels++;
+		int i = 0;
 		for (i = 0; i < x.n; i++) {
 			if (key < x.key[i]) {
 				break;
@@ -321,6 +332,7 @@ public class BTree implements org.tuc.interfaces.SearchInsert {
 	}
 
 	public boolean Contain(int k) {
+		resetLevels();
 		if (this.Search(root, k) != null) {
 			return true;
 		} else {
@@ -341,27 +353,42 @@ public class BTree implements org.tuc.interfaces.SearchInsert {
 		}
 	}
 
-    // Adapter to the required interface
-    @Override
-    public boolean searchKey(int key) {
-        return this.Contain(key);
-    }
+	@Override
+	public boolean searchKey(int key) {
+		return Contain(key);
+	}
 
-    @Override
-    public java.util.List<Integer> rangeQuery(int low, int high) {
-        java.util.List<Integer> res = new java.util.ArrayList<>();
-        rangeHelper(root, low, high, res);
-        return res;
-    }
+	@Override
+	public List<Integer> rangeQuery(int low, int high) {
+		resetLevels();
+		List<Integer> result = new ArrayList<>();
+		rangeQueryHelper(root, low, high, result);
+		return result;
+	}
 
-    private void rangeHelper(Node x, int low, int high, java.util.List<Integer> res) {
-        if (x == null) return;
-        int i;
-        for (i = 0; i < x.n; i++) {
-            if (!x.leaf) rangeHelper(x.child[i], low, high, res);
-            if (x.key[i] >= low && x.key[i] <= high) res.add(x.key[i]);
-        }
-        if (!x.leaf) rangeHelper(x.child[i], low, high, res);
-    }
+	private void rangeQueryHelper(Node x, int low, int high, List<Integer> result) {
+		if (x == null)
+			return;
 
+		lastAccessedLevels++;
+		int i = 0;
+		// Find first key >= low
+		while (i < x.n && x.key[i] < low) {
+			i++;
+		}
+		
+		// Explore the child before the first key >= low
+		if (!x.leaf) {
+			rangeQueryHelper(x.child[i], low, high, result);
+		}
+		
+		// Now iterate through keys starting from i and explore following children
+		while (i < x.n && x.key[i] <= high) {
+			result.add(x.key[i]);
+			i++;
+			if (!x.leaf) {
+				rangeQueryHelper(x.child[i], low, high, result);
+			}
+		}
+	}
 }

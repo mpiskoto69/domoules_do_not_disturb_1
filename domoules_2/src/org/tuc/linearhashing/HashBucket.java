@@ -114,6 +114,7 @@ class HashBucket {
 	public boolean searchKey(int key, LinearHashing lh) {
 		int i;
 		int bucketSize = lh.getBucketSize();
+		lh.incrementLevels();
 
 		for (i = 0; (i < this.keysNumber) && (i < bucketSize); i++) {
 

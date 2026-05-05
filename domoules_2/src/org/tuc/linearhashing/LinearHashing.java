@@ -1,85 +1,82 @@
 package org.tuc.linearhashing;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class LinearHashing implements org.tuc.interfaces.SearchInsert {
 
-	private HashBucket[] hashBuckets;	// pointer to the hash buckets
+	private HashBucket[] hashBuckets; // pointer to the hash buckets
 
-	private float maxThreshold;		// max load factor threshold
-	private float minThreshold;		// min load factor threshold
+	private float maxThreshold; // max load factor threshold
+	private float minThreshold; // min load factor threshold
 
-	private int bucketSize;		// max number of keys in each bucket
-	private int keysNum;			// number of keys currently stored in the table
-	private int keySpace;			// total space the hash table has for keys
-	private int p;				// pointer to the next bucket to be split
-	private int n;				// current number of buckets
-	private int j;				// the n used for the hash function
-	private int minBuckets;			// minimum number of buckets this hash table can have
+	private int bucketSize; // max number of keys in each bucket
+	private int keysNum; // number of keys currently stored in the table
+	private int keySpace; // total space the hash table has for keys
+	private int p; // pointer to the next bucket to be split
+	private int n; // current number of buckets
+	private int j; // the n used for the hash function
+	private int minBuckets; // minimum number of buckets this hash table can have
 
-	private int hashFunction(int key){	// Returns a hash based on the key
+	private int hashFunction(int key) { // Returns a hash based on the key
 
 		int retval;
 
-		retval = key%this.j;
+		retval = key % this.j;
 		if (retval < 0)
 			retval *= -1;
-		if (retval >= p){
-		  return retval;
-		}
-		else {
-			 retval = key%(2*this.j);
-			 if (retval < 0)
-				 retval *= -1;
-	         return retval;
+		if (retval >= p) {
+			return retval;
+		} else {
+			retval = key % (2 * this.j);
+			if (retval < 0)
+				retval *= -1;
+			return retval;
 		}
 	}
 
-	private float loadFactor() {		// Returns the current load factor of the hash table.
+	private float loadFactor() { // Returns the current load factor of the hash table.
 
-		return ((float)this.keysNum)/((float)this.keySpace);
+		return ((float) this.keysNum) / ((float) this.keySpace);
 	}
 
-	private void bucketSplit() {		// Splits the bucket pointed by p.
+	private void bucketSplit() { // Splits the bucket pointed by p.
 
 		int i;
 		HashBucket[] newHashBuckets;
 
-		newHashBuckets= new HashBucket[n+1];
-		for (i = 0; i < this.n; i++){
-		   newHashBuckets[i] = this.hashBuckets[i];
+		newHashBuckets = new HashBucket[n + 1];
+		for (i = 0; i < this.n; i++) {
+			newHashBuckets[i] = this.hashBuckets[i];
 		}
 
 		hashBuckets = newHashBuckets;
 		hashBuckets[this.n] = new HashBucket(this.bucketSize);
 		this.keySpace += this.bucketSize;
-		this.hashBuckets[this.p].splitBucket(this, 2*this.j, this.p, hashBuckets[this.n]);
+		this.hashBuckets[this.p].splitBucket(this, 2 * this.j, this.p, hashBuckets[this.n]);
 		this.n++;
-		if (this.n == 2*this.j) {
-		  this.j = 2*this.j;
-		  this.p = 0;
-		}
-		else {
-		    this.p++;
+		if (this.n == 2 * this.j) {
+			this.j = 2 * this.j;
+			this.p = 0;
+		} else {
+			this.p++;
 		}
 	}
 
-	private void bucketMerge() { 		// Merges the last bucket that was split
+	private void bucketMerge() { // Merges the last bucket that was split
 
 		int i;
 
 		HashBucket[] newHashBuckets;
-		newHashBuckets= new HashBucket[n-1];
-		for (i = 0; i < this.n-1; i++) {
-		   newHashBuckets[i] = this.hashBuckets[i];
+		newHashBuckets = new HashBucket[n - 1];
+		for (i = 0; i < this.n - 1; i++) {
+			newHashBuckets[i] = this.hashBuckets[i];
 		}
 		if (this.p == 0) {
-		  this.j = (this.n)/2;
-		  this.p = this.j-1;
-		}
-		else {
-		  this.p--;
+			this.j = (this.n) / 2;
+			this.p = this.j - 1;
+		} else {
+			this.p--;
 		}
 		this.n--;
 		this.keySpace -= this.bucketSize;
@@ -87,7 +84,7 @@ public class LinearHashing implements org.tuc.interfaces.SearchInsert {
 		hashBuckets = newHashBuckets;
 	}
 
-	public LinearHashing(int itsBucketSize, int initPages) { 	// Constructor.
+	public LinearHashing(int itsBucketSize, int initPages) { // Constructor.
 
 		int i;
 
@@ -97,48 +94,79 @@ public class LinearHashing implements org.tuc.interfaces.SearchInsert {
 		n = initPages;
 		j = initPages;
 		minBuckets = initPages;
-		keySpace = n*bucketSize;
-		maxThreshold = (float)0.8;
-		minThreshold = (float)0.7;
+		keySpace = n * bucketSize;
+		maxThreshold = (float) 0.8;
+		minThreshold = (float) 0.7;
 
 		if ((bucketSize == 0) || (n == 0)) {
-		  System.out.println("error: space for the table cannot be 0");
-		  System.exit(1);
+			System.out.println("error: space for the table cannot be 0");
+			System.exit(1);
 		}
 		hashBuckets = new HashBucket[n];
 		for (i = 0; i < n; i++) {
-		   hashBuckets[i] = new HashBucket(bucketSize);
+			hashBuckets[i] = new HashBucket(bucketSize);
+		}
 	}
-}
 
-	public int getBucketSize() {return bucketSize;}
-	public int getKeysNum() {return keysNum;}
-	public int getKeySpace() {return keySpace;}
-	public void setBucketSize(int size) {bucketSize = size;}
-	public void setKeysNum(int num) {keysNum = num;}
-	public void setKeySpace(int space) {keySpace = space;}
+	public int getBucketSize() {
+		return bucketSize;
+	}
 
-	public void insert(int key) {	// Insert a new key.
+	public int getKeysNum() {
+		return keysNum;
+	}
+
+	public int getKeySpace() {
+		return keySpace;
+	}
+
+	public void setBucketSize(int size) {
+		bucketSize = size;
+	}
+
+	public void setKeysNum(int num) {
+		keysNum = num;
+	}
+
+	public void setKeySpace(int space) {
+		keySpace = space;
+	}
+
+	public void insert(int key) { // Insert a new key.
 
 		this.hashBuckets[this.hashFunction(key)].insertKey(key, this);
-		if (this.loadFactor() > maxThreshold){
-		  this.bucketSplit();
+		if (this.loadFactor() > maxThreshold) {
+			this.bucketSplit();
 		}
 	}
 
-	public void delete(int key) {	// Delete a key.
+	public void delete(int key) { // Delete a key.
 
 		this.hashBuckets[this.hashFunction(key)].deleteKey(key, this);
-		if (this.loadFactor() > maxThreshold){
-		  this.bucketSplit();
-		}
-		else if ((this.loadFactor() < minThreshold) && (this.n > this.minBuckets)){
-			 this.bucketMerge();
+		if (this.loadFactor() > maxThreshold) {
+			this.bucketSplit();
+		} else if ((this.loadFactor() < minThreshold) && (this.n > this.minBuckets)) {
+			this.bucketMerge();
 		}
 	}
 
-	public boolean search(int key) {		// Search for a key.
+	private long lastAccessedLevels;
 
+	public long getLastAccessedLevels() {
+		return lastAccessedLevels;
+	}
+
+	public void incrementLevels() {
+		lastAccessedLevels++;
+	}
+
+	private void resetLevels() {
+		lastAccessedLevels = 0;
+	}
+
+	public boolean search(int key) { // Search for a key.
+
+		resetLevels();
 		return this.hashBuckets[this.hashFunction(key)].searchKey(key, this);
 	}
 
@@ -147,24 +175,19 @@ public class LinearHashing implements org.tuc.interfaces.SearchInsert {
 		int i;
 
 		for (i = 0; i < this.n; i++) {
-		   System.out.println("Bucket[" + i + "]");
-		   this.hashBuckets[i].printBucket(this.bucketSize);
+			System.out.println("Bucket[" + i + "]");
+			this.hashBuckets[i].printBucket(this.bucketSize);
 		}
 	}
 
+	@Override
+	public boolean searchKey(int key) {
+		return search(key);
+	}
 
+	@Override
+	public List<Integer> rangeQuery(int low, int high) {
+		return new ArrayList<>();
+	}
 
-
-    // Adapter to the required interface
-    @Override
-    public boolean searchKey(int key) {
-        return this.search(key);
-    }
-
-    @Override
-    public java.util.List<Integer> rangeQuery(int low, int high) {
-        // Range queries do not make sense for hashing; return empty list
-        return new java.util.ArrayList<Integer>();
-    }
-
-}
+} // LinearHashing class
