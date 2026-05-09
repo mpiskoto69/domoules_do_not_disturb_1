@@ -5,6 +5,7 @@ import org.tuc.avl.AVLTree;
 import org.tuc.bst.BSTree;
 import org.tuc.btree.BTree;
 import org.tuc.linearhashing.LinearHashing;
+import org.tuc.utils.RandomNumbersToFiles;
 
 import java.io.*;
 import java.util.*;
@@ -25,6 +26,7 @@ public class ExperimentMain {
     public static void main(String[] args) {
 
         System.out.println("==== EXPERIMENT START ====");
+        RandomNumbersToFiles reader = new RandomNumbersToFiles();
 
         double[][] insertTimes = new double[N_VALUES.length][NAMES.length];
         double[][] searchTimes = new double[N_VALUES.length][NAMES.length];
@@ -38,7 +40,7 @@ public class ExperimentMain {
 
             System.out.println("Running N = " + N + " | K = " + K);
 
-            int[] initialKeys = readInts("domoules_2/src/data/numbers-" + N + ".bin");
+            int[] initialKeys = reader.readInts("domoules_2/src/data/numbers-" + N + ".bin");
 
             SearchInsert[] structures = {
                     new BSTree(),
@@ -65,29 +67,6 @@ public class ExperimentMain {
         printFullTable("Search Times", searchTimes, true);
         printFullTable("Search Access Levels", searchLevels, true);
         printFullTable("Range Search Access Levels", rangeLevels, false);
-    }
-
-    private static int[] readInts(String fileName) {
-        try (FileInputStream fis = new FileInputStream(fileName);
-                DataInputStream dis = new DataInputStream(fis)) {
-
-            int size = fis.available() / 4;
-            int[] data = new int[size];
-
-            for (int i = 0; i < size; i++) {
-                int b1 = dis.read();
-                int b2 = dis.read();
-                int b3 = dis.read();
-                int b4 = dis.read();
-
-                data[i] = (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
-            }
-
-            return data;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Could not read file: " + fileName, e);
-        }
     }
 
     private static double[] measureInsert(SearchInsert[] structures, int K, int N) {

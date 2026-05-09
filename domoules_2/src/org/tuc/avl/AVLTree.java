@@ -107,11 +107,12 @@ public class AVLTree implements SearchInsert {
         if (root == null)
             return new Node(key);
 
-        else if (key < root.value)
+        if (key < root.value)
             root.left = insertNode(root.left, key);
-
-        else
+        else if (key > root.value)
             root.right = insertNode(root.right, key);
+        else
+            return root; // Duplicate
 
         // Balances the tree after BST Insertion
         return balanceTree(root);
@@ -173,15 +174,7 @@ public class AVLTree implements SearchInsert {
 
     // Utility function for insertion of node
     public void insert(int key) {
-        if (findNode(Root, key) == null) {
-            Root = insertNode(Root, key);
-            // System.out.println("Insertion successful");
-        }
-
-        else {
-            // System.out.println("\nKey with the entered value already exists in the
-            // tree");
-        }
+        Root = insertNode(Root, key);
     }
 
     public int search(int key) {
